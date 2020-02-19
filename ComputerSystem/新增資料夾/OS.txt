@@ -1,0 +1,209 @@
+----------【 General Computer 】
+- Motivation: 曾經的電腦透過固定電路實作，只能做固定功能且更改需直接修改硬體。
+- Goal: 做出一個能不修改電路的設計
+- Implement: Stored Program Computer
+	- Information:
+		> 將「program」存在memory內，並在執行時讀取
+		> 所有的指令(instruction)與資料(data)都必須存在於memory才可讀取
+		> 通用圖靈機的實現
+	
+	- Advantage:
+		> 能在不更動硬體的前提下達成各種功能，「program」概念浮現於世
+	
+	- Disadvantage:
+		> 速度較原先的固定電路架構慢
+		> 需要有timer的穩定配合才能順利執行fetch/excute cycle
+	
+	- Method: Von Neumann Architecture
+		/                      [ fetch/excute cycle ]        
+		|
+		|                   | Arithmetic/Logic Unit(ALU) |
+		|		            |                            |
+		|                   |          ^    |            |
+		|                   |          |    v            |
+		|                   |                            |
+		|   | Input    | -> |      Control Unit(CU)      | -> | Output  |
+		|   | Unit(IU) | <- |                            | <- | Unit(OU)|
+		|                   |          ^    |            |
+		|                   |          |    v            |
+		|                   |                            |
+		|                   |       Memory Unit(MU)      |                   
+		|
+		\
+		
+		- Define:
+			MU: 記憶單元，負責儲存instruction與data等資料的地方
+			ALU: 計算單元，負責資料間的運算處裡
+			CU: 控制單元，負責控制所有單元的流程，電腦操作的核心
+			IU: 輸入單元，代表現實對電腦的輸入(控制、資料)
+			OU: 輸出單元，代表電腦對現實的輸出(控制、資料)
+		
+		- Algorithm: 
+			1. fetch: CU至MU讀取指令(instruction)放入指令暫存器(IR)
+			2. decode: CU將指令解讀，知道要控制哪些單元
+			3. excute: CU依照指令執行，有若干種類的指令
+				計算: 
+					1. CU至MU讀取資料(data)
+					2. CU將資料送至ALU進行運算
+					3. ALU將算完的資料放入暫存器由CU取出
+					4. CU將資料放回MU
+				資料搬移:
+					1. CU至IU/MU取得資料
+					2. CU將資料放入OU/MU
+				...
+			4. 執行完畢後，程式計數器(PC)指向下一個指令準備fetch，重複1.
+		
+		
+----------【 Operating System (OS) 】
+- Motivation: 原本的Computer資源未有效利用，需要有方法去管理。
+- Goal: 能有效運用所有資源。
+- Implement: Operating System
+	- Information: 
+		> 也是一種program，須經由bootstrap load才可執行
+		> 在各方面進行介入排程，以達到多種功能與提升
+		
+	- Define:
+		> Instruction: 表示指令的一筆資料，能被CPU解讀
+		> Program: 多個instruction的集合，代表著一個功能(應用)該執行的指令順序
+		> Process: 執行中的program，擁有執行中的額外資訊 /* 參考【Process】 */
+		
+		> OS Structure: OS的實作方式
+			- Define:
+				> Simple structure: 想到就加上功能
+					- Disadvantage: 隨著架構增加而變得雜亂不堪，難以維護
+				
+				> Layered Approach: 階層架構，上層完全包含下層
+					- Advantage: 模組化，維修方便
+					- Disadvantage: overhead，架構難設計
+				
+				> Microkernel: 微核心系統，將核心負責的工作縮小，不必要的功能移出成為program
+					- Advantage: 安全性高，系統易移植
+
+				> Modules: 模組化，將功能實作成模組可方便移植，核心模組等同於Microkernel
+					- Advantage: 可動態讀取模組，易移植
+
+				> Hybrid System : 組合不同的structure
+					Example: Mac OS X (BSD + Mach)
+					Example2: iOS (Services +Core OS)
+					Example3: Android (Linux Kernel) (design by Open Handset Alliance)
+				
+	- Issue:
+		> Original:
+			/     [ OS in memory ]   
+			|
+			|          momery
+			|		|----------|
+			|       |    OS    |
+			|       |----------|
+			|       |  Process |
+			|       |----------|
+			|       |          |
+			|       |          |
+			|       |----------|
+			\
+			
+			- Information:
+				> 透過OS能動態load program
+				> 需等待process執行結束後才會回到OS執行
+			
+			- Advantage: 透過load program能讓電腦在不關機修改的情況下執行不同program
+			
+		> Interrupt: 透過中斷機制讓控制權回歸OS
+			/                        
+			|       Program               Program
+			|		-------\     OS     /------>
+			|               \----------/  (back)
+			|                (interrupt)
+			\
+			
+			- Information:
+				> 原本必須等Process執行結束才能回到OS，因此無法做任何排程。
+				> 中斷使得OS能做額外的事情，調度、排程，甚至是控制Process存活。
+				> 多了除了busy waiting的選擇，更加有效率利用資源。
+				
+			- Define:
+				> Hardware Interrupt: 由硬體裝置發出的中斷。ex: timer, DMA
+				> Software Interrupt: 為CPU指令，可轉換指令層級或呼叫其他程式，多用於System call。
+				
+			- Implement:
+				> Interrupt vector: 中斷碼
+					- Information: 保留一定數量的位置(memory)給interrupt，並定義每個interrupt代表的含意。
+					- Advantage: 相較Generic handling快速
+					- Disvantage: 有數量上限
+					
+				> Generic handling:
+					- Information: 透過一個額外可調整的table決定此interrupt需做何種行為。
+					- Advantage: table的大小可任意調整，接收數量無上限
+					- Disvantage: 多透過一步存取table的過程，速度較慢
+					
+				> Mix: 混和前兩者實作，將常用、重要的用Interrupt vector。現今系統主流。
+				
+			- Advantage:
+				> No polling: 可不再使用極度耗費CPU資源的busy waiting來不斷確認，使CPU可以完成更多事。
+		
+		> Multiprograming(Multitask)(多工): 指一台電腦能夠處裡多個程式的能力。 /* 參考【Process】 */
+			
+		> Protection: 透過各種機制的保護，防止program間彼此互相破壞。
+			/            
+			|   |----------------------------|   
+			|   |         Processes          |
+			|   |----------------------------|       
+			|   |           Kernel           |
+			|   |---^----------^---------^---|   
+			|       |          |         |
+			|   |---v---| |----v---| |---v---|
+			|   |  CPU  | | Memory | |  I/O  |
+			|   |-------| |--------| |-------|
+			|
+			\
+			
+			- Define:
+				> Kernel: OS的最基本元件，硬體與軟體間的溝通橋梁
+					> 最初program是可直接存取硬體的，但在安全性及複雜性的情況下漸漸衍生出Kernel概念
+				
+			- Implement:
+				> Dual_Mode: 分成兩種mode，將某些敏感指令限制以達成對memory、I/O等共享資源的保護。
+					- Define:
+						> user_mode: process執行時預設模式，只能對自己分配的memory、I/O做操作。
+						> system_mode (monitor_mode)(kernel_mode): 有極大的權力，system call需先切換成此模式。
+					
+					- Implement:
+						> PSW: 標示當前mode的暫存器
+						> Privileged instruction: 可跨mode的instruction
+						
+				> System call: kernel提供有限的method給Application呼叫使用，以此得以執行system_mode的功能。
+					> 透過 Trap interrupt 呼叫
+
+		> CPU Scheduling /* 參考 CPU 文件 */
+		> Memory Manage /* 參考 Memory 文件 */
+		> I/O Devices /* 參考 IO 文件 */
+			
+		> Virtual Mechine: 模擬電腦機器的硬體，可在上面加載新的OS達成多系統
+			/        
+			|                              |--------------|--------------|--------------|  
+			|                              |   Processes  |   Processes  |   Processes  |
+			|   |-------------|            |--------------|--------------|--------------|  
+			|   |  Processes  |            |    Kernel1   |    Kernel2   |    Kernel3   |
+			|   |-------------|            |--------------|--------------|--------------|   
+			|   |    Kernel   |  =>        | VM hardware1 | VM hardware2 | VM hardware3 |
+			|   |-------------|            |--------------|--------------|--------------| 
+			|   |   Hardware  |            |                VM Implement                |
+			|   |-------------|            |--------------------------------------------|  
+			|                              |                  Hardware                  |
+			|                              |--------------------------------------------|  
+			|
+			\
+			- Information:
+				> 將擁有的Physical Device分配給自己為獨立擁有的OS 
+				> 有自己的Dual_Mode供上層使用，但不會影響下層。
+				> 可實作於user mode與system mode
+				
+			- Advantage:
+				> 可依系統情況調配硬體資源，而上層OS不會有所感覺
+				> I/O於VM層時很快，因為是在memory上操作
+				> 安全，系統間不互相影響
+				> OS易移植
+				> 可模擬停產硬體，以執行各種OS。
+			
+	- Relevant:
+		System Generation(SYSGEN): OS安裝系統會依照擁有的硬體去安裝額外功能(如DMA)，更加彈性的建構OS。

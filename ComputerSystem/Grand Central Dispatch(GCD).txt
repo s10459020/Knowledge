@@ -1,0 +1,12 @@
+introduction: GCD是multithread的一個管理機制，為Apple Mac OS與iOS所使用。
+	免去自己管理thread，將注意力擺在task。
+	
+GCD內有數個queue，並提供方法讓thread將task(block)傳入queue
+	queue有兩種種類: concurrent與serial
+		concurrent: queue裡面的task可同時執行
+		serial: queue裡面的task只能依序執行
+	block的傳入也有兩種種類: async與sync
+		async: 將block的執行交給thread pool去做，thread本身放入queue後則繼續執行
+		sync: 等待queue輪到block時，thread本身執行完畢
+	
+透過queue的選擇與block傳入，來管理multithread。

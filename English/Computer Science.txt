@@ -1,0 +1,7 @@
+vertice 頂點
+resultant 結果
+	result 
+determine 判斷、確定
+incident 附加的、偶然(n)
+derangement number 排列數
+convenience 方便

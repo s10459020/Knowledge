@@ -1,0 +1,153 @@
+
+
+----------【 Process Execution 】
+- CPU_Burst: 有很長時間在計算
+- I/O_Burst: 大多都在等I/O而沒計算，如GUI
+
+
+----------【 Process Scheduling 】
+new -> ready -> running -> waiting
+             VV
+    short_tern schedual
+
+- Nonpreemptive Scheduling (非侵占式)
+	> 直到自願停下時才可進行切換
+
+- Preemptive Scheduling (侵占式)
+	> 會隨時隨地被搶走CPU
+	> 在進行I/O時會中斷發生Synchronization問題
+	> 修改資料途中被中斷，會導致資料Crash
+
+
+----------【 Process Criteria 】
+做排程時有幾個不同的標準
+- CPU Utilization: CPU使用率
+- Throughput: 完成的工作量
+- Turnaround Time: 任務完成時間
+- Waiting Time: process在wait的時間
+- Response Time: 系統回應時間
+
+
+----------【 Algorithms 】
+
+	[ FCFS (First_come, First_Serve) ]
+任務依序執行，如同排隊一樣 -> Queue
+- 可能會被long CPU_burst或I/O_burst阻擋而浪費資源
+- Nonpreemptive
+
+	[ SFJ (Shortest_Job_First) ]
+短的任務先做完，有最小的waiting time
+- Nonpreemptive: 排完就不可改動
+- Preemptive: 若加入的process時間小於正在處理的，則可以搶先
+
+	[ Priority Scheduling ]
+按照優先權，Priority與criteria需有非常貼切的關係
+- 先來的高優先權 -> FCFS
+- 較短的高優先權 -> SFJ
+- Nonpreemptive
+- Preemptive 
+- Starvation(永遠低於別人的priority，可用Aging解決，wait_p++ or run_p--)
+
+	[ RR (Round_Robin) ]
+每個任務皆輪流一段相同時間(time slice)，很類似FCFS
+- FIFO queue，執行到時間的程式重新排隊
+- 小的quantum會有context switching浪費
+- Turnaround Time: 差
+- Waiting Time: 普
+- Responsed Time: 佳
+
+	[ Multilevel Queue ]
+將ready queue切成多個queue，每個都可套用上者的方法
+- Inter_queue //queue之間的排程
+	> priority Scheduling，讓系統排程>程式排程>背景排程...
+	> 各queue可擁有屬於自己的排程
+		// system queue用RR
+		// background queue用FCFS...
+- Multilevel Feedback Queue
+任務可以在不同queue間移動
+	> ex: 8time-> 16time-> FCFS排程可讓I/O bound程式有高利用效率
+	
+
+	[ Multiple_Processor Scheduling]
+- queue for each processor
+	> Self_Scheduling
+- queue for all processor
+	> Self_Scheduling
+	> Master-Slave
+- Load Balancing
+	> Push migration: 一特定process調節不平均的工作
+	> Pull migration: idel process從busy process上取工作
+- Processor affinity
+避免換process時要將cache刪除下次又重新載入的問題，作法是保留cache留做下次使用
+	> 與 imbalance 衝突
+	> Soft affinity
+	> hard affinity
+	
+
+	[ Other Multiprocessor ]
+- Symmetric Multithreading(SMT) i.e., Hyperthreading
+利用hardware thread，能同時刻的(simultaneously)運算以增加效能。
+> hardware thread: 又稱logic CPU，增加硬體單元(integer加法器、ALU...)使一個CPU模擬出的Virtual CPU
+
+- Non_Uniform Memory Access(NUMA)
+將Momery切成區塊，與數個Processor包一起
+
+- Very Long Instruction Word(VLIW)
+將數個不同種類instruction裝成instruction packet，同步計算
+	
+	
+----------【 Multicore Processors 】
+- Memory Stall(速度太慢)-> Multiple Hardware Threads
+	> Coarse_Grained Multithreading //粗粒度
+		Thread執行長時間後才換，一次Context switch要清空Cache、Pipe
+	> Fine_Grained Multithreading //細粒度
+		Thread快速交換，Cache同時保留多個Thread資訊不用在switch時清空
+	
+	
+----------【 Virtualization 】
+- Hardware Thread 
+- Advantage: 可模擬更多資源(CPU、I/O裝置...)
+			可利用Migration節省資源
+- Disadvantage: slower
+
+
+----------【 Real-Time CPU Scheduling 】
+- Soft Real-Time: 盡量執行程式(priorty)但不能保證
+- Hard Read-Time: 嚴格限制程式執行時間
+- Latency type
+	> Interrupt Latency //中斷造成的延遲
+	> Dispatch Latency //process轉換造成的延遲
+- Priority_Based Preemptive Scheduler // 給real-time process高優先權保障
+	> Rate_Monotonic Scheduling // 週期越快優先權越高
+		> Fixed Priority 
+		> Achievable Utilization Factor: N(2^(1/N)-1) //69%以下保證沒事
+		> Critical Instant 
+			最差的case，所有排程同一時間到達
+	> Earliest Deadline First Scheduling
+		> Dynamic Priority Assignment 
+		> Achievable Utilization Factor: 1 // 100%以下保證沒事
+		> 因現行系統很多Fixed Priority，且這個有overhead而無法盛行
+- Other
+	> Proportional Share Scheduling // 比例分配
+		
+
+----------【 OS Scheduler 】
+- 現在大多數作業系統都偏向讓I/O burst的程式有高優先度，以達最高使用效率
+
+		
+----------【 Algorithm Evaluation 】
+- Deterministic Modeling //以數學分析何種最好
+	> 在即時電腦上沒那麼多時間算
+	
+- Queueing Models //以當前排隊情形來判定
+	> n = W * λ
+	> n 為列隊的總任務數量
+	> W 為平均wait time
+	> λ 為進入列隊的頻率
+	
+- Simulation: 寫程式模擬環境，用結果評估程式適合哪種
+	> 模擬Event資料困難
+	
+- Implementation: 直接實作在系統上，以反映回饋去改進
+	> 修改成本太昂貴
+	> 會引起使用者不滿

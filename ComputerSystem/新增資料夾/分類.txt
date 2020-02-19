@@ -1,0 +1,191 @@
+Software{
+	Operator System{
+		Mode{
+			Dual_Mode,
+			Virtual Mechine,
+		},
+		Interface{
+			System Call{
+				Type{
+					Job Control,
+					File Management,
+					Device Management,
+					Communication:IPC
+				}
+			},
+			Interrupt{
+				type{
+					Interrupt Vector
+					Generic Handling
+				}
+			},
+		}
+		structure{
+			simple Structure,
+			Layered Approach,
+			Microkernel,
+			Modules,
+			Hybrid System
+		}
+		Scheduling{
+			Long-tern,
+			Mid-tern,
+			Short-tern
+		}
+	}
+	Process{
+		Type{
+			CPU_Burst,
+			I/O_Burst
+		}
+		Attribute{
+			State{
+				new,
+				ready,
+				running,
+				waiting,
+				termination
+			}
+			PCB{
+				CPU: PC, Register...
+				Memory: location...
+				I/O: request, holding...
+			}
+		}
+		Function{
+			Context Switch,
+			Communication{
+				Type{
+					Symmetric/ Asymmetric,
+					Blocking/ Nonblocking,
+					Zero Capacity/ Bounded/ Unbounded
+				}
+				Issue{
+					Termination,
+					Lost message,
+					Scrambled message
+				}
+				Solution{
+					IPC{
+						Shared Memory,
+						Message Passing,
+						Pipe
+					},
+					Socket,
+					RPC
+				}
+			}
+		}
+		Scheduling{
+			Criteria{
+				CPU Utilication,
+				Throughtput,
+				Turnaround Time.
+				Waiting Time,
+				Response Time
+			}
+			Type{
+				Preemptive/ Nonpreemptive,
+			}
+			Algorithm{
+				FCFS,
+				SFJ,
+				Priority Scheduling,
+				RR,
+			}
+		}
+	}
+	Thread{
+		Parallelism{
+			Data,
+			Task
+		}
+		Model{
+			Many_to_One,
+			One_to_One,
+			Many_to_Many
+		}
+		Method{
+			Thread Pool,
+		}
+	}
+}
+Hardware{
+	Processor{
+		Type{
+			Multiprocessor{
+			},
+		}
+	}
+	Stroage{
+		type{
+			Register,
+			Cache{
+				
+			},
+			Memory{
+				Memory mapped I/O,
+				Programmed I/O
+			},
+			Disk
+		}
+	}
+	I/O{
+		Solution{
+			DMA,
+		}
+	}
+}
+Algorithm{
+	Caching{
+	
+	},
+	Synchronization{
+		Mutual Exclusion
+		Cause{
+			Deadlock
+			Starvation
+			Race Condition
+				Critical Section
+		}
+		Solution{
+			Mutex Locks
+			Semaphores
+				Binary
+			Hardware
+			Priority Inversion
+			Bounded Buffer
+			Monitor
+		}
+		Example{
+			Producer/Consumer
+			Reader/Writer
+			Peterson's Solution
+			Multiple Process Solution
+			Dining Philosphers
+		}
+	}
+	DeadLock{
+		Cause{
+			Mutual Exclusion
+			Hold and Wait
+			No Preemption
+			Cirular wait
+		}
+		Algorithm{
+			Resource Allocation Graph
+			Banker's Algorithm
+				Signal Instance/Resource
+				Multiple Instance/Resource
+		}
+		Solution{
+			Prevention
+			Avoidance
+			Detection
+			Recovery
+				Termination
+				Resource Preemption
+				Combined Approaches
+		}
+	}
+}

@@ -1,0 +1,7 @@
+inverse function
+relation
+	symmetric
+	reflexive
+	transitive 
+determinant 行列式
+least squares solution 最小平方解

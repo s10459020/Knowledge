@@ -1,0 +1,87 @@
+mathematics
+	Master Theorem
+	Combinatorial proof 組合證明
+	Bijective proof
+	Cook reduction
+	Karp reduction
+	
+graph
+	degree
+	Hamilton Circuit
+	Euler Circuit
+	directed
+	Representation
+		sequential: https://youtu.be/oTG6DK5ZzZc
+		adjacency multilist
+		Adjacency Matrix
+		Adjacency List
+	
+heap
+	min / max tree
+	min-max tree
+	deap
+	min / max leftist tree
+	
+tree
+	forest
+	Trie
+	B-Tree(2-3, 2-3-4)
+	Binary Tree
+		successor
+		predecessor
+		complete binary tree
+		full binary tree
+		
+		AVL tree
+		red-black
+		
+Linked List
+	Double Linked List
+	
+compiler
+	Short-circuit evaluation
+	
+Algorithm
+	recursion
+	time complex
+	
+Service
+	FTP
+	TELNET
+	SNMP
+	nameserver(DNS)
+	MIME
+	
+Object-oriented
+	polymorphism
+	encapsulation
+	inheritance
+	late binding
+	
+sort
+	quick sort
+	bucket sort
+	heap sort
+	merge sort
+	
+algorithm
+	graph
+		Dijkstra's algorithm
+		
+	string search
+		KMP pattern matching algorithm
+		
+	binary tree
+		DFS
+			preorder traversal
+			inorder traversal
+			postorder traversal
+		BFS
+		
+	compression
+		Dictinary Compression
+		Lempel-Ziv Compression
+		Run-length Compression
+			Burrows-Wheeler Transform
+		Arithmetic Compression(效率最好)
+		Huffman encoding

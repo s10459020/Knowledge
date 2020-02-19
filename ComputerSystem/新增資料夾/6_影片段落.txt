@@ -1,0 +1,14 @@
+	[ 待補 ] 
+	
+0:0:54 Consumer_Producer
+0:9:55 Peterson's Solution 
+0:22:23 Bakery Algorithm
+0:31:49 TestAndSet & Swap
+1:14:27 Binary Semaphore
+1:15:13 Producer/ Consumer use Semaphore (Bounded Buffer Question)
+1:18:28 Readers/ Writers use Semaphore (Starvation)
+1:23:35 Dining_Philosophers (Deadlock)
+1:29:56 Producer/ Consumer use Critical Regions
+1:32:08 Implementation Regions by Semaphores
+1:36:20 Dining_Philosophers use Monitor
+1:44:31 Implementation Monitor by Semaphores 

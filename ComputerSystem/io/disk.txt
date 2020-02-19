@@ -1,0 +1,107 @@
+		【Disk】
+- Define:
+	> Component: Platters, Arm, Head
+	> Units: Cylinders(垂直環), Tracks(環), Sectors(塊)
+	
+> Disk Structure:
+	> 給所有Sector編號
+	> 磁區定義:
+		> Constant Linear Velocity(CLV): 每個sector等長，外圈有較多sector
+		> Constant Angular Velocity(CAV): 每個sector等角，外圈稀疏而內圈密集
+		
+> Disk Attachment:
+	> Host Attached Storage(HAS): 安裝在主機端上的裝置，透過I/O Bus傳輸資料
+	> Direct Attached Storage(DAS): storage ~ file system ~ computer，外接裝置。
+	> Network Attached Storage(NAS): storage ~ file system ~ (network) ~ computer。storage與file system在另一端上，需與當地管理系統溝通。
+	> Storage Area Network(SAN): storage在另一端，透過網路與storage溝通
+		
+> Disk Scheduling:
+	> Access time = queuing time(排隊於指令列表) + seek time(磁頭尋找) + latency delay(磁盤轉動) + transfer time(讀取時間): seek time最花時間，要想辦法減少
+	> FCFS: 先到指令則先服務。ex: 305, 30, 5, 225
+									O
+			O<<<<<<<<<<<<<<<<<<<<<<<<
+		O<<<<
+		>>>>>>>>>>>>>>>>O			then 305, 150
+						>>>>>>>>>>>>O
+					O<<<<<<<<<<<<<<<<
+					
+	> Shortest_seek_time_first(SSTF): 選最短的路徑，可能會造成starvation。ex: 305, 30, 5, 225
+			O
+		O<<<<
+		>>>>>>>>>>>>>>>>O				then 305, 150
+					O<<<<
+					>>>>>>>>>>>>>>>>O
+					
+	> Scan(Elevator) Algorithm: 到底後才換方向，像搭電梯ㄧ樣。ex: 295, 30, 150
+	> (C-Scan: 到底後回到最初，像circle一樣)
+			O
+			>>>>>>>>>>>>O
+						>>>>>>>>>>>>O
+								O<<<<	then 5, 70, 225
+				O<<<<<<<<<<<<<<<<
+		O<<<<<<<<
+		
+> Disk Redundant Array of Independent Driver(RAID)
+	> 將便宜的硬碟組合起來，使容量變大性能提升
+		RAID 	Disk	Capacity	Efficacy	Safity		Applicate
+		JBOD	>2		All			none		0			增加容量
+		RAID 0	>2		All			most		0			追求效能
+		RAID 1	>2		50%			little		most		追求安全備份
+		RAID 10	>4		50%			high		high		無成本限制追求兩者
+		RAID 5	>3		N-1			>R, <W		good		便宜的折衷方案
+	
+	> Just a Bunch of Disk(JBOD)
+		> 將所有DISK合起來當一個大DISK
+		> 存取機制為從第一顆開始往後依序使用
+		> 安全性沒提升
+		> 效率沒提升
+		
+	> RAID 0
+		>
+			  Disk 1  Disk 2
+				A1		A2
+				A3		A4
+				A5		A6
+				A7		A8
+		> 將所有DISK並列起來當一個大DISK，資料分散擺放
+		> 沒安全性
+		> 可並行存取每個DISK，速度是最快的
+		
+	> RAID 1
+		>
+			  Disk 1  Disk 2
+				A1		A1
+				A2		A2
+				A3		A3
+				A4		A4
+		> 將兩組以上的DISK互作映像檔，彼此內容是一樣的
+		> 若有損毀可複製其他DISK，最高可以到同時壞N個才會遺失資料，安全性是最高的
+		> 速度沒提升
+	
+	> RAID 2
+	
+	> RAID 5
+		>
+			  Disk 1  Disk 2 Disk 3
+				A1		A2     Ap
+				B1		Bp     B2
+				Cp		C1     C2
+		> 每個資料用奇偶校正位元Xp進行保障，分別放到不同Disk內讓任意Disk壞掉時可復原資料
+		> 不錯，有基礎的復原資料能力，且無論哪個Disk壞掉都不會讓校正失效。
+		> 不錯，可並列讀取，寫入的效正不太花時間
+		
+		
+> Disk Management:
+	> Disk Formatting
+		> physical formatting: 磁碟切成數個sector，出廠通常會做好
+		> partitioning: 分成磁區
+		> logical formatting: 將磁區格式化成指定File system
+	
+	> Raw Disks: 可直接透過編號寫入sector，而不經過file system等格式化
+	> Boot Block: 做Partitioning時有一個負責儲存與開機的區域
+		> Master Boot Record(MBR): 內有boot code與partition table，BIOS的boot結束後會載入這裡的boot
+		> Boot Partition: 含有OS的磁區
+		
+	> Bad Blocks: 要有機制迴避掉損毀的block
+		> Sector_Sparing / Forwarding: 重新定址到可用block
+		> Sector Slipping: file system移位

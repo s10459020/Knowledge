@@ -1,0 +1,15 @@
+分兩步驟
+	Step 1: 對initial value證明
+	Step 2: 對n+1證明
+	
+EX: Fibonacci
+	F(0) + F(1) + ... = E[0 to n]F(i) = F(n+2) - 1
+	
+	Step 1: EF(0) = 0, EF(1) = 1
+			EF(0) = F(2)-1 = 1-1 = 0
+			EF(1) = F(3)-1 = 2-1 = 1
+			
+	Step 2: EF(n) = F(n+2) - 1
+			EF(n+1) = EF(n) + F(n+1)
+					= F(n+2) -1 + F(n+1)
+					= F(n+3) -1

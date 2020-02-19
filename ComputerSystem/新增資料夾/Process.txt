@@ -1,0 +1,80 @@
+// 3_4
+----------【 Process 】
+- Motivation: 隨著OS與Multiprogram的出現，對於一個正在執行的程式需要有更進一步的定義
+
+- Define:
+	> PID: Process的編號。每個Process都有不同的PID供OS區分。
+	> State: 代表process現在的執行狀態，用於排程。
+		/           [ state flow ]        
+		|
+		|   (new)         |---------------------|                   (termination)
+		|     |           v                     |                         ^
+		|     |------> (ready) -----------> (running) --------------------|
+		|                 ^                                               v
+		|                 |                                           (waiting)         
+		|                 |                                               | 
+		|                 |---------------wait IO finish------------------|           
+		|                 |                                               |           
+		|                 |--------fork subprocess and wait finish--------|           
+		|                 |                                               |           
+		|                 |---------------write data in Disk--------------|           
+		|                 |                       .                       |           
+		|                 |                       .                       |           
+		|                 ^                       .                       v         
+		\
+	
+		- Define:
+			> new: 剛新建的process，處於正在分配資源(memory...)的狀態。
+			> ready: 隨時準備執行的process。
+			> running: 擁有CPU使用權、正在執行運算的process。
+			> waiting: 因I/O或中斷而等待著工作完成的狀態，在等待完成後才可回到ready。
+			> termination: 已經結束執行的process，處於等待回收資源的狀態。 
+			
+		
+	> Process control block(PCB): 存儲著process的資訊。
+		> PID
+		> State
+		> Program Counter(PC): 電腦讀取決定下一條指令的位置
+		...
+	
+- Issue:
+	> Multiprograming(Multitask)(多工): 指一台電腦能夠處裡多個程式的能力
+		> 過去為單工系統，一台電腦一次只能執行一個program，必須等結束後才可執行另一個program
+		> 多工系統允許一個process執行到一半時進行Context Switch，換另一個Process執行。
+		- Advantage: 
+			> 可避免CPU空等IO之類的浪費時間，更有效運用資源。
+			> 能允許使用者同時執行多個任務。
+			
+	> Inter_process communication(IPC): 關於同台電腦上兩個Process如何溝通的技術
+		- Motivation: process間有時會有彼此溝通的需求，但OS的protect機制使得彼此無法容易的溝通。
+		- Define: 
+			> Symmetric/ Asymmetric: 兩者溝通時的任務是否相等、平均。
+			> Zero/ Bounded, Unbunded Capacity: 溝通時的訊息儲存容量。
+			> Blocking/ Nonblocking: 兩者在溝通時是否會block。
+				> blocking send: 送出資料時會等對方收到。
+				> nonblocking send: 送出資料後不管是否有達到目的地。
+				> blocking receive: 一直等待直到有一筆資料可被讀取。
+				> nonblocking reveive: 若buffer內沒有資料可接收就算了。
+				> blocking send and receive又稱Rendezvous
+				
+		- Implement:
+			> Shared Memory: 共享相同的儲存空間，對同一位置進行讀寫。
+				> Symmetric 
+			> Message Passing:
+			> Socket:
+			> Pipe:
+		
+		- Issue:
+			> Termination: 當有一方意外中斷時，是否會導致永久block等問題。
+			> Lose message: 資料遺失、過久未送到的問題。
+				> time out: 設置時間計數器限制訊息最久傳送時間，否則就判定為遺失。
+				> OS resend: 由OS負責重送訊息。
+				> Sender resend: 由Program負責重送訊息。
+				> multiple copies: 重送訊息與原訊息都收到時，會有重複訊息的問題。
+			
+									<-? !!!  ?->
+	> Context switch
+	> Scheduling
+	
+- Relevant:
+	> Program: 未load的程式碼，大致為數個instruction的結合。

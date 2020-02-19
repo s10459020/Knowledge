@@ -1,0 +1,278 @@
+----------【 Memory 】
+	[ Binding Time ]
+- Define: 根據定址到實體記憶體的時機，分成不同的Binding Time。
+	/
+	|      compiler               loader              MMU
+	| code --------> object file --------> program --------> instruction
+	|          v                     v                 v
+	|    compiler_time           load_time          run_time
+	\
+		
+- Implement
+	- Dynamic Linking: load_time
+		> Motivation: 讓某些library獨立出來，達到共享、即時更新、縮小程式等效果。
+		- Relevant:
+			> Static Linking: 在Compiler時就合在一起，而不是於load後
+
+	- Dynamic Loading: run_time
+		> Motivation: 讓某些library在需要時才載入，節省memory空間。
+		
+	- Overlays: run_time
+		> Motivation: 將program分成好幾段，讓所有段落依序放在同個位置上執行，以節省memory空間。
+		> Algorithm:
+		    /                    Memory
+			|   70 KB          |--------|           80 KB
+			|  stage_2 ------> |  85KB  | -------> stage_1
+			\                  |--------|
+			
+			1. 依據最大stage去分配空間
+			2. 當stage(i)執行完畢後移除，並讓stage(i+1)覆蓋於同樣位置
+			3. 重複2.直到程式執行完畢
+			
+	- Swapping: run_time
+		> Motivation: 將位於Disk的program與載入memory的program交換，以節省memory空間
+		> Issue: 
+			1. 進行Disk I/O速度太慢，會拖慢整個系統的速度。
+				- Solution:
+					> 減少swapping quantity，只搬有需要、重要的就好
+					> 讓execution time超過swapping time，才不會讓系統等待
+					> 將相近的資料放附近，減少disk seek time時間
+			
+	- MMU
+		> Motivation: 在多工環境下重新定址位置，讓每個program可以不用管其他硬體
+		> binding time: run_time
+		> hardware support
+		> Algorithm: 
+			/
+			| CPU ---------------> MMU ---------------> memory
+			|     logical address      physical address
+			\
+			
+			1. CPU解析instruction後，得到logical address
+			2. Scaling: MMU將logical address重新定址到physical address
+			3. 將physical address傳入memory定址
+	
+	
+	[ Allocation Method ]
+- Define: 將資訊儲存在如Disk, memory等storage的方法，選用適當方法會影響性能與效率。
+- Implement:
+	> Contiguous Allocation: 全部連在一起順序擺放，如array是最好的例子。
+		- Advantages:
+			1. easy: 觀念簡單實作容易。
+			2. fast reading: 資料相鄰，很容易能找到下一筆資料。
+			3. direct access: 位置固定，能直接存取。
+		
+		- Disadvantages:
+			1. External Fragmentation
+			2. not Flexible: 難移動，切割後不保持完整性。
+			
+		- Implement:
+			> Single Process Contiguous Allocation:
+				> 單工系統，Memory只有OS與單個program
+				
+			> Multiple Process Contiguous Allocation:
+				> 多工系統，兩種partitions去分配給每個process
+					- Fixed Partitions : 切成固定大小的block，將process分別放入每個block
+						> Internal fragmentation
+						> 程式過大會無法放入
+						
+					- Dynamic Partitions: 每個block大小跟program一樣大，任意放入memory
+						> External gragmentation
+						> Fit method: 當有新的process P要加入時的策略
+							1. First Fit: 找到第一個大小足夠，可以放P的區域就放入。  
+							2. Best Fit: 找到最佳的(最小但剛好)區塊，放入P
+							3. Worst Fit: 找到最差的(最大差很多的)區塊，放入P
+							
+	> File Allocation Table(FAT): 將資訊分block任意儲存，並以額外資訊table來管理與定址。
+		- Advantages:
+			1. flexible: block大小可任意決定，更能善加運用資源
+			2. reliable: 資訊損毀不會影響其他block
+			3. direct access: 透過table存取實現了部分的直接存取
+			
+		- Disadvantages: 
+			1. 若FAT entries很多，FAT會很肥大。
+			2. Internal Fragmentation
+			
+		- Implement:
+			> Paging
+			> Segmentation
+	
+	
+	[ Fragmentation ]
+> 未能有效利用的剩餘空間，越少則代表越有效利用資源。
+> External fragmentation: 不在任何block的
+	> Compaction: 將所有fragmentation合起來，以更好加以利用
+> Internal fragmentation: P最後面未用到的小空間
+
+		
+	[ Paging ]
+> Memory 切成數個 fixed-size Block(Page/Frame)  // 很像Fixed Partitions
+> 每個process擁有數個分散各地的Pages，並用Page Table來使標記要使用哪些Frame當自身的Page
+> Internal Fragmentation
+	
+- Information:
+	Logical Address = m,  // [p, d]
+	Physical Address = l,  // [f, d]
+	Page offset = n.  // d
+	
+	- Logicl Address: m bit
+		> Logical Address Space: 2^(m) words
+		> p: m - n bit
+		> d: n bit
+		> Page entry: e bit  // 通常是word大小
+		- Page Table:
+			> Page Table Size: Pages Number * Page Size　* Page entry = pow(2, m+e) bytes
+			> Page Max Size: pow(2, n) entries
+			> Pages Max Number: pow(2, m-n) pages
+	
+	- Physical Address: l bit
+		> Physical Address Space = 2^(l) words
+		> f: l - n bit 
+		> d: n bit
+		> Memory entry: 4 bytes  // word
+		- Memory:
+			> Memory Size: Frames Number * Frame Size * Memory entry = pow(2, l+4) bytes
+			> Frame Max Size: pow(2, n) entries
+			> Frames Max Number: pow(2, l-n) frames
+			
+- Algorithm 1: Only Page Table
+	> Graph
+		CPU -----[p, d]----->| Page Table |------[f, d]------> Memory
+		
+	> Logical Address [p, d]: Page Number, Page Offest
+	> Physical Address [f, d]: frame Number, frame Offest
+	
+	1. CPU 產生 logical address('p' and 'd').
+	2. 將虛擬位置 Page Number scaling成實體位置 Page location(number + Page Table Base).
+	3. 產生 Physical Address('f', and copy 'd' in there).
+	4. 利用Frame number找到正確的frame. 
+	
+- Algorithm 2: Page Table + TLB
+	> Graph
+		CPU -----[p, d]----TLB Miss---->|  Page Table |------[f, d]------> Memory
+				  |-------------------->| TLB enrty 1 |       ^
+				  |-------------------->| TLB enrty 2 |-------| 
+				  |-------------------->| TLB enrty 3 | TLB Hit
+	
+	1. CPU 產生 logical address('p' and 'd').
+	2. TLB 尋找是否有存相同的Page Number.
+	3. TLB Hit: 從TLB找到位置，填入'f'
+	4. TLB MISS: 找不到，Scaling Page Number 並到Page Table尋找
+	5. 產生 Physical Address('f', and copy 'd' in there).
+	6. 利用Frame number找到正確的frame. 
+	7. 將新的[tag, value]加入TLB.
+	
+	> TLB Miss: 多了Scaling, Memory access, Update的過程
+	
+	
+- Implement
+	- Page Table
+		> Table in Register: fast, but need small
+			- Advantages: 
+				> Fast Allocation: one memory access.
+			- DisAdvantages:
+				> Size need small.
+				> Slow Context Switch: need all be replace.
+		
+		> Table in Memory:
+			- Advantages: 
+				> Fast Context Switch: only replace Page_Table Base Register(RTBR).  // Page Table Base 用在Scaling
+				> Size is Unlimited.
+			- DisAdvantages:
+				> Slow Allocation: twice memory access.  // 使用TLB改善
+					
+	- Translation Look_aside Buffer(TLB)
+		> 用以減少Table in Memory的二次存取，新增allocation的第二途徑.
+		
+		- information:
+			> 存儲最近使用過的Page Number(tag)及轉換後的Frame Number(value)，相當於一個速查表.
+			> 大多時候能取代Page Table，產生Frame Number且快很多時間
+			> TLB Hit: 透過TLB得到Number，省去了scaling, access, generation的過程
+			> TLB Miss: 未在TLB時依然到Page Table去找，並且更新TLB(Overhead)
+			> Hit Ratio: Hit/ (Hit + Miss)
+				> 現今Ratio可達90%以上
+				> Intel 486 有 32_register TLB 以及宣稱有98% Ratio
+			> Access Time: (Ratio * (TLB access + Memory access)) + ((1 - Ratio) * (TLB access + Table access + Memory access))
+				> 現今可大略看成 90% HIT(1 Memory access) + 10% MISS(2 Memory access) = 1.1 Average Memory access
+			
+		- Advantages: 
+			> TLB Hit時的速度比TLB Miss的速度快很多，1 Miss Time ~= 10 Hit Time
+			> 一次的TLB Miss能帶來非常多TLB Hit
+			> 與原本將Table放在Memory的方法(2 Memory access)來說快將近一倍
+			
+		- Disadvantages: 
+			> 需使用額外硬體，增加成本
+			
+		> Address_Space Identifiers(ASID):
+			> 為了預防Context Switch後的大量TLB Miss
+			> 將TLB切成多個區域並以ASID來區分給process使用，Switch 時替換 ASID 的作法取代了flush TLB
+			
+	- Protection 
+		> 善加利用Page entry的額外bit，做出額外的功能
+		> program code bit  // 標示是否為程式碼，以決定是否被允許做修改
+		> dirty bit  // 資料是否以被修改，用於Caching_Buffering時的Synchronization
+		> Page Table 過大而資料過少:
+			1. Valid_Invalid bit: 標記這個Page entry是否需要使用，在維護Page entry時可忽略掉不須使用的部分
+			2. Page Table Length Register(PTLR): 在PCB裡加入PTLR去紀錄Page Table大小
+		
+	- Sharing
+		> 將相同program不同process的 code Pages 指向相同的Frame
+			> example:
+				notepad.exe P1's Page Table:
+					code1 page: frame 2,
+					code2 page: frame 5,
+					code3 page: frame 1,
+					data page: frame 3.
+					
+				notepad.exe P2's Page Table:
+					code1 page: frame 2,
+					code2 page: frame 5,
+					code3 page: frame 1,
+					data page: frame 9
+					
+!!!	- Multilevel Paging
+		> 由於page table 可能會大到甚至塞不進自己的page，所以要分層
+		> logical address [p, d] => [p1, p2, p3..., d]
+		> 能使table size變小，但total table size變大
+		> 需要做更多次的access
+		> 大多時只需做TLB Access，增加多層paging增加的時間其實不多
+				
+	- Hashed Page Table
+		> 為了更加節省memory，將所有process的table丟disk內
+		> 但避免TLB Miss時等待時間爆久，中間增加Hashed Page Table
+		> 所有程式共用Hashed Page Tables
+		> hash function用硬體取代，雖變貴但也能很快
+				
+	- Inverted Page Table	
+		> 為了更加節省memory，將所有process的table丟disk內
+		> 用一個共用的Inverted Page Table 去指向所有tables，而非只有自己的
+		> 需要利用Pid與page number才可找到自己的table frame number，但找尋要花時間
+		> 優點: 減少memory使用量
+		> 缺點: 尋找太花時間  // 須結合Hashed Page Table，先找TLB、Hash再找Invert
+		
+		
+	[ Segmentation ]
+	> Motivation: 將program依照邏輯劃分成多個長度不等的segment，任意放入memory內
+	> Relevant: Page  // 想法實作大多與Page相同
+	> External fragmentation
+	> Algorithm:
+		/                        Segment Table
+		|                      |       |      |
+		|           |--------->| limit | base |-------v             
+		| CPU -----[s, d]      |       |      |      (+)--->Memory
+		|              |           |                  ^
+		|              |           v                  |
+		|              |----------(<)-----------------|
+		\
+	
+		1. CPU 產生 logical address('s' and 'd').
+		2. 利用's'查詢到Segment Table enrty
+		3. 測試offset是否小於limit，若不是則發生意外(trap)
+		4. 將offset與base相加，取得memory address
+		5. 利用memory address找到位置讀取資料
+			
+	- Implement:
+		> TLB
+		> Segment_table base register(STBR)
+		> Segment_table length register(STLR)
+	

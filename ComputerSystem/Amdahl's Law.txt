@@ -1,0 +1,13 @@
+introduction: 計算speedup的算式，能知道「提升某元件的最大(極限)加速」
+speedup = (Ws + Wp) / (Ws + Wp/p)
+	Ws: 不可改變之元件所占的時間
+	Wp: 可改變之元件所占的時間
+	Wp/p: 改變後的時間
+	
+最大極限為(Ws + Wp)/ Ws，提升某元件的速度不可能無上限的加速。
+EX: 
+	40 memory access, 10 cpu access.
+=>	40 memory access,  1 cpu access, 4 cache access.
+
+	speed up: 50/45 = 10/9 ~= 1.11
+	max speed up: 50/40 = 1.25

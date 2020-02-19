@@ -1,0 +1,23 @@
+system step:
+	0. process call system call
+	1. 將parameter存儲
+		(a. 存在特定位置的register
+		 b. 存在memory並傳遞位置值
+		 c. 存在stack)
+	2. 存入system call號碼
+	3. 存入process中斷點
+	4. 呼叫trap instruction，轉換成特權模式
+		5. 解讀system call
+		6. 讀取參數執行後存儲狀態
+		7. 返回process中斷點
+	8. 取得system call呼叫後的返回狀態
+
+system_call vs trap:
+	system call在早期是用TRAP instruction指令實做，
+	雖然現在也有大多功能相同於TRAP但名子不同的種類出現，
+	但trap已經被廣泛認知為"TRAP instruction的實做"
+	
+trap vs interrupt:
+	trap和interrupt都是可以進入privileged mode，而兩者有些許不同。
+	trap(exception)是軟體發出，synchronous的執行後並返回
+	interrupt是硬體發出，asychronous的執行

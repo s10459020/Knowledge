@@ -1,0 +1,68 @@
+
+
+----------【 Thread 】
+LWP(Lightweight process) 輕量級的Process
+共用Code、部分Data的一個方式
+
+- Parallelism
+	Data parallelism: 切割資料用於同個任務
+	Task Parallelism: 資料用於不同任務
+
+- User_Level Thread
+	library支援的thread，只能在user層級使用
+	> 快速
+	> OS只看得到Process，看不到分出的Thread
+
+- Kernel_Level Thrad
+	OS支援的thread，由OS創建並管理
+	> Context Switch較深層，較久
+	> OS可直接管理Thread
+
+
+----------【 Multithreading 】
+
+	[ Models ]
+- Many_to_One (多user 單kernel)
+	> 快速
+	> 無法parallelism
+	> 一旦被block就所有user thread都停止
+
+- One_to_One (單user 單kernel)
+	> 慢速
+	> 可用於multiprocessor平行
+
+- Many_to_Many
+	> 可自由調整thread的對應
+	> 用於排程
+
+
+----------【 Implicit Threading 】
+
+	[ Thread Pools ]
+- 減少create, delete的次數以省去取得資源的耗費
+- 動態調整Thread
+
+	[ OpenMP ]
+- 自動將程式碼轉換成多thread
+- #pragma omp parallel for
+
+	[ GCD ]
+
+
+----------【 Issues 】
+
+	[ Fork ]
+- 創建新process時該複製所有thread還是複製呼叫的thread
+
+	[ Signal Handling ]
+傳給process的例外由誰接收
+- Synchronous: division_by_0
+- Asynchronous: ^C, timer expiration
+APCs(Asynchronous Procedure Calls): 資訊傳給thread 而非process
+
+	[ cancellation ]
+中止執行續時的幾種方式
+- Off: 不給關，只允許thread自己執行完畢
+- Deferred: 於安全點時檢查是否需要cancel，而不會立即關閉
+- Asynchronous: 立即關閉，無論是否正在進行I/O
+

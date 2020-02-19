@@ -1,0 +1,158 @@
+
+----------【 Interrupt 】
+
+Porgram               back
+-------\ interrupt  /------>
+        \----------/(overhead)
+
+
+- Interrupt Vector 中斷碼向量
+	> 快速
+	> 有數量限制
+
+- Generic Handling
+	> 較慢
+	> 可調整的數量 
+
+
+----------【 Stroage 】
+
+- Primary storage (10^-9 s)
+	> Register
+	> Cache (L1, L2, L3...)
+	> Memory (DRAM)
+
+- Secondary storage (10^-3 s)
+	> SSD
+	> Magnetic Disk (硬碟)
+
+- Tertiary storage (10^0 s)
+	> Optical Disk (CD)
+	> Magnetic Tapes
+
+
+----------【 Memory 】
+- Memory mapped I/O
+- Programmed I/O
+	> interrupt //for slow
+	> polling //for fast or preditable
+
+
+----------【 I/O Structure 】
+- Read: devices-> controll buffer-> memory
+- Write: memory-> controll buffer-> devices
+
+
+----------【 DMA (Direct Momery Access) 】
+- 減少CPU被interrupt的困擾
+- 內建於Device Controller內( DC介於CPU與Device中間，內建在電腦內的硬體，接收來自Driver的命令並與Driver溝通)
+- Procedure:
+	1. CPU(Driver程式時)下達指令
+	2. DMA從Memory搬資料到Device Controller Buffer
+	3. 從DC Buffer搬到Device Buffer
+	4. 重複 2-> 3-> 2-> 3 直到完成
+	5. 發送interrupt給CPU
+
+
+----------【 Multiprocessor 】
+- Tightly coupled:
+	共享著bus, memory, timer...的硬體
+- Lossely coupled:
+	反之
+
+- Advantages:
+	> speedup
+	> lower cost
+	> reliable(多系統以防止單一系統壞掉後無法運作)
+	
+- Symmetric: processor間相同層級，互相指派任務
+- Asymmetric: master- slave架構，由主端調派任務
+
+- Hyperthreading
+
+
+----------【 Hardware Protection 】
+- Dual_Mode OS雙層模式
+	> user_mode
+	> system_mode (monitor_mode)
+	> mode bit save in a register: PSW
+	> Privileged instruction: 可跨mode的重要指令
+
+- More mode
+	> Virtual Mechine
+	有於user_mode及system_mode的幾種實作
+	有屬於自己的virtual_user_mode及virtual_system_mode
+
+- System call
+	> by trap
+	> OS 提供的function
+
+- Resource Protection
+	> I/O Devices: privileged
+	> Memory: program specific area，每個程式有自己專屬的區域
+	> CPU: timer平均共享使用
+
+
+----------【 Cache 】
+往上cache，往下buffer
+cache: Tape-> Disk-> Memory-> Cache-> Register
+buffer: Register-> Cache-> Memory-> Disk-> Tape
+
+- 跨層問題: 每層資料難同步 (Coherency & Consistency)
+
+		Register	Cache		Memory		SSD		Disk
+size		< 1KB		< 16KB		< 64GB		< 1TB		< 10TB
+
+access time	0.5 ns		10 ns		200 ns		30 us		5 ms
+
+Bandwidth	50GB		8GB		3GB		500MB		50MB
+
+Managed by	Compiler	Hardware	OS		OS		OS
+
+Backup by	Cache		Memory		Disk		Disk		CD
+
+
+----------【 Computing Environment 】
+
+	[ 演化過程 ]
+桌上式-> 筆電-> 手機-> 分散式
+
+- Mobile Computing: 注重省電、好使用...
+
+	[ many system ]
+- Loosely_Coupled System: 數個相同系統相連，利用LAN、WAN、PAN...
+	> Networking Operation System: 網路內每個節點皆有自己OS
+	> Distributed Operation System: 一個OS控制所有電腦
+
+- Peer_to_Peer System: 雙方皆有Server/Client能力，要知道對方位置
+- Client_Server_System: Server端負責監聽就好
+
+
+	[ Virtual Machine ]
+模擬硬體給OS用
+
+Processes		Procs	Procs	Procs
+Kernel			Kern1	Kern2	Kern3
+Hardware	=>	VM hw1	VM hw2	VM hw3
+			VM implementation
+			hardware
+
+- 將擁有的Physical Device分配給自己為獨立擁有的OS
+- 可為User/System Mode
+- system call很慢
+- 可結合主機服務減少Idle耗損
+- I/O: 
+	> fast when write to VM memory
+	> slow for write in physical disk
+- Advantage:
+	> 安全，不影響其他系統
+	> OS易移植
+	> 可模擬各種裝置甚至已停產的，以執行各種OS
+- How it work:
+			   P1 system call				
+	P1	P2	P3------------->|		  K1 system call		    (for P1)	^---->
+	K1	K2	K3		|trap		^---------------|		^-------------->|
+	VM implementation		v-------------->|		v-------------->|
+	hardware			   (for K1)			   (for K1)
+
+

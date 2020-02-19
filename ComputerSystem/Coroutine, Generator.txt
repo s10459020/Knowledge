@@ -1,0 +1,12 @@
+Coroutine = cooperation(合作) + routine(例行作業，這領域意為function、method)
+Coroutine: 可任意中斷、繼續執行的函式呼叫。
+	利用yield()在特定的地方停止，
+	利用resume()呼叫停止的function繼續向前
+	藉由這樣方式達成有別於Thread的另一種Ansychronous方法。
+	
+	f1:	----------->yield()--------------->
+	                  ^
+	                  |-----|
+	f2: ----------------->resume()-------->
+	
+Generator:

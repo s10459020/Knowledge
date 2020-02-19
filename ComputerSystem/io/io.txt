@@ -1,0 +1,49 @@
+- Define:
+	> Driver: 負責處裡IO較複雜的事情，而OS就不用在IO這做太深入的設計。
+	> I/O Interface: 給IO統一介面，用Driver來隱藏細節
+		> Characteristics
+			> Character Stream / Block 
+			> Sequential / Random Access
+			> Synchronous / Asynchronous
+			> Sharable / Dedicated
+			> Speed
+			> Read / Write Only / Both
+		
+		> Access
+			> Block I/O
+			> Character_stream I/O
+			> Memory_Mapped File Access
+			> Network Socket
+			> System Calls
+	> I/O Schdualing
+		> Performance improve
+	> Buffer / Cache
+		> Performancce improve
+	
+- Implement:
+	> Access device:
+		> port_mapped IO: 用特殊指令去操作I/O。ex: ldio r0, 0x34
+		> memory_mapped IO: 用與操作memory相同的指令操作I/O。ex: ld r0, 0x34
+			> 將Device register投射到memory
+				> Data_in registers		// host讀取
+				> Data_out registers	// host寫入device
+				> Status register		// device的狀態
+				> Control register		// 設定device
+	
+	> How read data:
+		> programmed IO: 當device資料準備完畢時，用軟體搬移data至memory，會使用CPU資源，
+		> Direct Memory Access(DMA) IO: 當device資料準備完畢時，用硬體搬移data至memory，需增加額外硬體。
+			> 減少CPU操作的負擔
+			> 硬體內建於Device controller內( DC介於CPU與device中間，內建在電腦內的硬體，接收來自driver的命令並與driver溝通)
+			- Algorithm:
+				1. CPU(Driver程式時)下達指令
+				2. DMA硬體從Memory搬資料到device controller buffer
+				3. 從DC buffer搬到device buffer
+				4. 重複 2-> 3-> 2-> 3 直到完成所有任務
+				5. 通知CPU任務完成
+			
+	> How notify event:
+		> interrupt driven IO: 使用interrupt告知系統操作已經完成。	
+			> 通常用於慢速的裝置
+		> polling IO: 每隔一段時間CPU就去確認任務是否完成，會使用CPU資源。
+			> 通常用於快速、操作頻繁的裝置

@@ -1,0 +1,20 @@
+reflexive : 自己對自己
+	ex 1: R = {x^2 = y^2}，平方相等
+		(x,x) => x^2 = x^2 滿足
+	ex 2: R = {x < y}，小於
+		(x,x) => x !< x 不滿足
+
+symmetric : 有(a,b)就要有(b,a)
+asymmetric : 有(a,b)就不能有(b,a)，有(a,a)也不能
+antisymmetric: 有(a,b)就不能有(b,a)，除非是(a,a)
+	ex 1: R = {x^2 = y^2}，平方相等
+		(x,y) => x^2 = y^2, y^2 = x^2 滿足symmetric
+	ex 2: R = {x < y}，小於
+		(x,y) => x < y, y !< x 不滿足symmetric
+		
+		
+transitive : 關係可傳遞
+	ex 1: R = {x < y}，小於
+		(x,y,z) => x < y, y < z, x < z 滿足
+	ex 2: R = {x^2 = y}，平方
+		(x,y,z) => x^2 = y, y^2 = z, x^2 != z 不滿足

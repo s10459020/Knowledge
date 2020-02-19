@@ -1,0 +1,84 @@
+	【 Cache 】
+- Define:
+	> Block: cache的基本單位
+	> Cache Hit: Cache內有資料
+	> Cache Miss: Cache內沒需要資料，需進行Memory Access
+	> Miss penalty: 發生Cache Miss時花費的時間
+	
+- Motivation:
+	> Locality的特性
+		> Temporal Locality: 相同資料很可能會在短時內重複使用
+		> Spatial Locality: 資料讀取後下一筆資料很大機率會在下一個或附近
+	
+- Implement:
+	> Write:
+		> write through: 在寫入cache時同時也寫入memory
+			> 簡單
+			> 每次都要memory access，慢
+		> write back: 只寫入cache，而後統一寫入memory
+			> CPU效率高
+			> 難
+			> cache與memory有同步上的問題
+		
+		- cache miss時
+			> write allocation: 更新cache後寫入
+				> 使用write through: 搬到cache後寫入兩個並沒甚麼意義
+				> 使用write back: 適用於短時間內讀取的資料
+			> write around: 直接寫入memory而不更新cache
+				> 使用write through: 適用於不會馬上讀取的資料
+			
+	> Mapping:
+		> 將block平均分給cache，當編號後段(xxxx001, xxxx010)與cache的編號(001, 010)相同時則可放於此位置
+			> target block address: 01111011		
+			> logical address: [tag][cache index]([block index])([word index])
+				| 01111 || 011 || ... |
+				
+			> cache entry: [valid][tag][data]
+					 valid    tag      data
+					|-----||-------||---------|
+				 001|  0  || 01101 ||   ...   |
+					|-----||-------||---------|
+				 010|  1  || 00110 ||   ...   |
+					|-----||-------||---------|
+				 011|  1  || 01111 ||   ...   |	01111 = tag, hit!
+					|-----||-------||---------|
+					
+			> valid: 紀錄block是否為有效
+			> tag: 紀錄編號前段(xxxx部分)，tag與cache number可得出記憶體位置
+		
+		> Set associative
+			> 將cache內的block集合成一個set，比對時須對set內每個block都比對一次
+			> block越多，同一cache能存的tag越多，cache hit越高。
+			> block越多，硬體成本增加、時間越高
+			> block越多，miss時搬移的數量越多、時間越高
+			> Set = 1: Direct map
+			> Set = N: Fully associative
+			
+	> Memory Organization:
+		> 假設transfer size = 2 words
+		> 假設data size = 8 words
+		> 假設access time = 1 cycle(instruction fetch), 10 cycle(memory access), 1 cycle(write back)
+		> One_word_wide: CPU <-n-> Cache <-n-> Main memory
+			> Miss penalty = (data / transfer) * (access time) = 48 cycle
+			> Memory bandwidth = (transfer) / (access time) = 2 * 4 / 12 = 0.66 byte/cycle
+			> 需要傳送block size/ bandwidth次，也就是進行這麼多次memory access
+			> 最慢
+			> 最便宜、簡單
+		
+		> 假設k = 4		
+		> Wider Main Memory: CPU <-n-> Cache <-k * n-> Main memory，加大Memory與Cache的傳輸量
+			> 加大物理線路，增加bandwidth進而減少傳輸次數
+			> Miss penalty = (data / (transfer * k)) * access time = 12 cycle
+			> Memory bandwidth = (transfer * k) / access time = 8 * 4 / 12 = 2.64 byte/cycle
+			> 速度最快
+			> 成本最高
+		
+		
+		> 假設k = 4
+		> Interleaved Memory: CPU <-n-> Cache <-n-> (memory 1, ..., memory k)，透過一次的記憶體存取讀出數筆資料，再依序傳輸
+			> 將memory分割成數個，只需做一次memory access，多次write back
+			> Miss penalty = (data / (transfer * k)) * (fetch + access + (write back * k)) = 15 cycle
+			> Memory bandwidth = (transfer) / (access time) = 0.66 byte/cycle
+			> 速度偏快
+			> memory切割技術像RAID一樣，同個block分散於不同切割區
+			

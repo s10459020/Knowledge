@@ -1,0 +1,322 @@
+
+----------【 Synchronization 】
+
+	[ Cause ]
+- Race Condition // 因執行順序而導致的資料錯誤
+	> 不定時的Context switch
+	> 以指令為執行單元
+	
+	
+	[ Issue ]
+- Critical_Section // 會影響資料的區域
+	> 將對一筆資料的操作鎖在「只有一個process能進入的空間」，能確保操作連續而不會被其他process影響資源(而非防止Interrupt與Switch)
+	- 將程式分成Four Section
+		1. entry section: 進入critical section的前置處理區
+		2. critical section: 資料處理區，須保護的區塊
+		3. exit section: 離開critical section的後續處理區
+		4. remainder section: 無關緊要區域
+	
+	- 演算法須滿足Three Requirement
+		1. Mutual Exclusion: 同時間只有1個process進入critical section  // 防止Race Condition
+		2. Progress: 確保程式能順利執行，進出critical section機制永遠暢通  // 確保可用性，防止Deadlock
+			a. 只有不在remainder section的人才能影響進入critical section的決策  // 確保可用性，決策不受與Critical section無關的程式如已中止的process影響
+			b. 進入critical section的條件必須不可卡住  // 防止Deadlock，有限時間能決定完畢
+		3. Bounded Waiting: 讓Process有公平的條件進入Critical Section，而不會永遠被插隊  // 防止Starvation
+
+- DeadLock
+	> 大家都在等別人擁有的Resource，而導致整個停滯不前
+	> Resource:
+		> Physical: CPU、memory...
+		> Logical: file、semaphores...
+		
+	- Necessary Condition  // 四種關係都存在的時候，才會造成Deadlock
+		1. Mutual Exclusion: 一定要有非共享的資源
+		2. Hold and Wait: process在擁有資源的情況下等待資源
+		3. No Preemption: 不可搶佔資源，只能等待
+		4. Cirular Wait: 造成迴圈等待
+		
+	- Solution		
+		- Prevention  // 讓至少一個Condition永遠不發生
+			> 用在極度不可發生Deadlock的場合，如攸關生命的系統
+			> Mutual Exclusion:  // 讓資源共享，不發生wait
+				> 要讓所有資源共享永遠不互斥不太可能(螢幕、PC register)
+			
+			> Hold and Wait:  // 保證能hold全部才hold，必免wait時有部分hold
+				1. 將 A->B->C 分成 A->B 與 B->C ，減少Deadlock可能性
+					> 一樣會 Deadlock
+					> 在斷點時資源可能被搶走、修改
+				2. 只在 A, B 能一次hold時才執行，否則將一直wait這個情況
+					> Low Utilication
+					> Starvation
+			
+			> No Preemption:  // 搶走resource而不wait到工作結束
+				1. 當下直接搶
+					> 像write disk等操作不能硬搶，否則會讓資料壞掉
+				2. 對方waiting時才能搶，否則等待
+					> 確保對方並沒有running
+			
+			> Cirular Wait:  // 防止迴圈發生，確保一定有一個process不卡住
+				1. 給資源編號，當要求資源時只能hold小的種類，並wait大的種類
+					> 確保wait的資源順序永遠比所有hold的大，以達成單方向wait
+					> 若想取得較小的資源，則必須丟棄所有hold的資源重新取得
+					> Order順序難定義，會隨著程式設計師的喜好而有所不同
+			
+			> Resource Allocation:
+		
+		- Avoidance  // 透過額外資訊動態資源分配以防止發生Deaklock，永遠確保安全
+			> 用在不太能發生Deadlock的場合，寧可多花些資源計算
+			> 類似於Recovery裡的Detection，頻率很高且在分配之前先行計算
+			1. Store information  
+				> # of available  // 系統還可分配的資源
+				> # of allocated  // 已分配的資源
+				> max of resource  // process提前宣告的資源最大使用量
+				
+			2. IS SAFE? Find Safe Sequence  // 找出安全路徑，使資源分下去後絕對能逐一完成工作
+				> for all Pi , need(Pi) <= available + allocated(Pi-1) + allocated(Pi-2)...
+				> need(Pi) = max(Pi) - allocated(Pi)
+				> unsafe != Deadlock
+				
+			3. STILL SAFE? Allow Request or Wait
+				> Safe Sequence => 若分配後可達成Safe Sequence，則允許Pi的request
+				> 若分配request會使Safe Sequence無法成立，則只能wait
+			
+			> Resource Allocation Graph(Single Instance):
+				- Information:
+					> Claim Edge: Pi ...> Ri
+					> Request Edge: Pi ---> Ri
+					> Assignment Edge: Pi <--- Ri
+					
+				- Solution:
+						R1 ---> P1 ...> R2
+						 ^----- R2 .....^
+			
+					1. cycle maybe cause Deadlock => 不允許 request!
+						R1 ---> P1 ...> R2
+						 ^----- R2 <----|
+						 
+					2. waiting P1 finish
+						R1 ---> P1 <--- R2
+						 ^----- R2 .....^
+						 
+					A: 只允許P1 request，P2若發出時須wait
+					
+			> Banker's Algorithm(Multiple Instance):
+				- Information:  // m Resource, n Process
+					> Available[m]  
+					> Max[n, m]  
+					> Allocation[n, m] 
+					> Need[n, m]  
+					
+					> Work[m] // 暫時存放，代表計算過程的Available
+					> Finish[n] // 暫時存放，代表每個procress有沒有滿足Need並足以執行完畢釋放資源
+					
+				- Algorithm:  // 能知道當前狀態是否為安全
+					1. Work = Avaliable, 
+						\ Finish[0 to n] = False
+					2. Find i satisfy below then goto 3., or goto 4.:
+						(1) Finish[i] = F
+						(2) Need[i] <= Work
+					3. Work = Work + Avaliable[i],
+						\ Finish[i] = True,
+						\ goto 2
+					4. IF Finish[0 to n] == True => SAFE 
+					
+				- Solution:
+					1. If Request > Need: Process說謊，發生Trap
+					2. If Request > Avaliable: 不用測，直接wait
+					3. Otherwise: 假設request通過並分配後，透過Banker's Algorithm去判斷是否Safe
+						> 假設request通過:
+							1. Avaliable = Avaliable - Request
+							2. Allocation = Allocation + Request
+							3. Need = Need - Request
+							4. Banker's Algorithm
+						
+						> Safe: request可接受
+						> Unsage: wait
+		
+		- Recovery  // 發生Deadlock後才解決問題
+			> 雖然發生後會卡住影響系統，但能有很高的resource utilization
+			> Overhead:
+				> maintenance information
+				> detection algorithm
+				> potential loss(restart Pi, preemptive...)
+			
+			1. Detection  // 首先先偵測到發生Deadlock
+				- Wait-For Graph(Single Instance)
+					> Resource Allocation Graph的簡化 // 只剩 Pi--->Pj 一種模式
+					> 較前者演算法快
+					
+				- Multiple Instance Algorithm
+					> 類似於Banker's Algorithm
+					
+					- Information:
+						> Available[m]  
+						> Allocation[n, m] 
+						> Request[n, m]  // 當前的request
+					
+					- Algorithm
+						// note: 步驟裡面有request <= work的判定感覺不合理
+						//		(為何有需求卻沒供應)，但第一次通常會對request=0的做判定
+						1. Work = Available,
+							\ IF Allocation[i] == 0, THEN Finish[i] = True,
+							\ IF Allocation[i] != 0, THEN Finish[i] = False
+						2. Find i satisfy below then goto 3., or goto 4.:
+							(1) Finish[i] = F
+							(2) Request[i] <= Work
+						3. Work = Work + Allocation[i],
+							\ Finish[i] = True,
+							\ goto 2
+						4. IF Finish[i] == False => Pi has in Deadlock! 
+		
+			2. Recovery  // 發現Deadlock後，著手進行解決
+				- Termination  // 透過殺process解決
+					1. Kill all of Deadlock membere!
+					2. Kill one by one
+						> how to choose?
+				- Resource Preemption  // 透過暫時釋出resource解決
+					> how to choose?
+					> roll back
+					> starvation
+			
+		- Ignore  // 佛系Deaklock，不解決等下次重開就好了
+			> Deaklock影響不大時也可就這樣不管
+					
+		- Combined Approaches  // 依照不同層面的資料用不同方式維護
+			- example: 
+				> Kernel Internal Resource: Prevention
+				> Central Memory: Prevention
+				> Job Resource: Avoidance
+				> Swappable Space: Prevention
+				...
+				
+	
+	[ Solution ]
+- Soft Solution  // 只以軟體來實作互斥
+	- Peterson Algorithm
+		> 利用變數flag與turn來達成雙process的互斥
+		> flag[]: 表示想進入Critical Section
+		> turn: 表示誰被允許進入Critical Section
+		
+		- Version 1 Solution: only turn
+			> condition: for i, when (turn == i)  // 當自己被允許時才可執行
+			> issue: progress無法滿足
+			> example: 當i轉讓turn給j時，j必須進入critical section才能將turn轉給i，否則i將永遠卡住。
+		
+		- Version 2 Solution: only flag
+			> condition: for i, when (flag[j] == false)  // 當對方沒有想使用時才可執行
+			> issue: progress無法滿足，會造成Deadlock
+			> example: 當i,j同時想進入section時會同時使flag = true，而後雙方都會無止境地等對方用完。
+			
+		- Version 3 Solution: both turn and flag
+			> condition: for i, when NOT(flag[j] == true AND turn == j)
+				// 當對方不同時滿足兩個條件時(想卻不被允許、不想但被允許)，自己就可以做
+			- issue:
+				1. Mutual Exclusion: 滿足，透過turn能決定唯一執行的process
+				2. Progress: 滿足，只有在對方於section時才會被阻擋進行，flag確保不受remainder section以後的程式影響
+				3. Bounded Waiting: 滿足，turn防止兩者同時進入時一方無盡的等待
+				
+				
+	- Lamport's Bakery Algorithm // 多程序拿號碼牌的機制
+		> 利用choosing、number、thread_id達成多process的互斥，模擬拿號碼牌流程
+		> choosing[]: 表示是否正在拿號碼牌
+		> number[]: 表示拿到的號碼牌，應該要比目前最大號碼還要+1，0為不排隊
+		> (thread_id): 當發生同時取號碼牌(+1後也為相同號碼)則取最小thread_id的順序執行
+		
+		- Solution:
+			> Entry Section:
+				1. 於choosing期間拿取Max(number.getAll())+1的號碼
+				2. 由0~n對每個process j做兩個condition，所有做完才可進入Critical Section
+			> condition 1: for i, when (choosing[j] != true) // 確保對方已經做完拿號碼牌過程
+			> condition 2: for i, when NOT((number[j] != 0) AND (number[j],j) < (number[i],[i])) // 當對方不同時滿足想進入及號碼相對小的條件時，自己就可進入
+				// number[j] != 0 代表對方拿到號碼牌準備進入
+				// (number[j],j) < (number[i],i) 看作 (number[j] < number[i]) OR ((number[j] == number[i]) AND (j < i))
+					1. number[j] < number[i]，號碼牌比較小
+					2. j < i，號碼一樣但thread_id比較小
+		- notice:
+			choosing[]是必須的，以防發生以下事件發生:
+				i與j同時領號碼牌，領到相同號碼(max()完但未指派變數)
+				i還沒寫入號碼牌，j就搶先做判斷
+				j於condition 2看見i號碼為0(還沒寫入)，因此進入section後換i執行
+				i於condition 2看見i,j號碼一樣且i<j，因此進入section
+				i和j就同時進入critical section
+		
+- Hardware Solution  // 要有硬體支援
+	> Disable Interrupt	 // 停止interrupt可導致No Preemption，但也會導致real_time process問題
+	> Atomic Hardware Instruction  // 以一個不可分割(atomic)的function來實作
+		(若沒有適當的機制，只靠下面方法會導致Starvation)
+		- TestAndSet(boolean lock)  // 將lock鎖住，並回傳前一次狀態
+			> 類似於正緣觸發，只在false->true時的lock才有效
+			> entry: (lock = true), (key = lock(i-1))
+			> condition: (key == false)
+			> exit: lock = false
+			- waiting Solution  // 利用waiting、key來避免Starvation
+				> 以親手交給下個process的方始，避免了Starvation也保持著其他條件的符合
+				> waiting[]: 代表等待的flag，在i,j進行交接時會直接操作此變數
+				> key: 讀取鎖的正緣觸發，只有最頭及最尾的程式會操作到
+				- issue:
+					1. Mutial Exclusion: key == False OR waiting[i] == false
+					2. Progress: lock = false OR waiting[j] = false
+					3. Bounded Waiting: j = (i+1)% n 使最大等待次數為n-1次
+					
+		- Swap(boolean key, boolean lock)  // 交換key與lock狀態
+			> 每次執行時只會有一次的指派true與false，總量並不會變
+			> entry: (lock = key), (key = lock)
+			> condition: (key == false)
+			> exit: lock = false
+			
+		- Mutex Lock
+			> entry(acquire): condition, then lock = false
+			> condition: (lock == true)
+			> exit(release): lock = true
+			
+		- Semaphores
+			> 進階版Mutex Lock，輸入值S為integer
+			> (S = 1) => Mutex Lock
+			> entry(wait): condition, then S--
+			> condition: (S > 0)
+			> exit(signal): S++
+
+- High_Level Constructor  // 包裝entry、exit、condition...，以免編程錯誤
+	- Critical Regions
+		- using: Region name when (Brance) do S
+			> name: 同名只有一個能進行，很像lock一樣
+			> Branch: 為進入此region的判斷，即使多個regions都符合判斷也只有一個能進
+			> S: 為Critical Section
+		- 用semaphore實作
+		
+	- Monitor
+		能保證同一時間只有1個process執行procedures
+		- using: monitor name{ variable, x, procedures... }
+			> name: monitor名稱
+			> variable: 只能被procedures所使用的區域變數
+			> x: 有著semaphore的wait()與signal()
+			> procedures: 一次只能執行一個的函數
+			
+			
+	[ Example ]
+- Consumer_Producer Question
+	> 兩者共用一個buffer(circuar queue)，在存取buffer時的counter會發生衝突
+- Reader_Writer Question
+	> Writer只能單個寫入，而Reader能同時讀取而不互相干擾，write時會發生衝突
+- Dining_Philosophers Question
+	> 五人五支筷，需要同時拿身旁筷子才能動作，在拿筷子時會發生衝突
+
+
+	[ Other Issue ]
+- Priority Inversion  // 依Priority影響使用權
+	> 當低priority程式佔著高priority城市的資源時的一種轉換機制
+	> 高佔低則不用理會
+	
+- Spinlock/ block_waiting  // 實作lock時的兩種等待模式
+	> spinlock: 使用while等待，會增加Overhead，但能使短程式免去Context Switch
+	> block_waiting: 使用queue及wakeup()，讓等待的process等待interrupt而不耗資源
+	
+- Resource Allocation Graph  // 資源分配圖，常用在Deadlock問題上
+	- Vertices
+		> Processes P1, P2...
+		> Recource R1, R2...
+			> Signal Instance
+			> Multiple Instance
+	- Edges
+		> Request Edge Pi -> Ri
+		> Assignment Edge Ri -> Pi

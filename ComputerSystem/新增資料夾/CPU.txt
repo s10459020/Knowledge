@@ -1,0 +1,23 @@
+// CH5
+----------【 CPU Scheduling 】
+- Motivation: 於Multitask的時代，CPU被大量的process同時使用，所以需要一個有效的排程來管理。
+- Implement:
+	> Long_tern scheduling: 抉擇何種program可進入系統
+	> Mid_tern scheduling: 抉擇何種process需要被swap或termination
+	> Short_tern scheduling: 抉擇何種process可從ready進入running
+	
+	----------【 Multiprocessor 】
+- Tightly coupled:
+	共享著bus, memory, timer...的硬體
+- Lossely coupled:
+	反之
+
+- Advantages:
+	> speedup
+	> lower cost
+	> reliable(多系統以防止單一系統壞掉後無法運作)
+	
+- Symmetric: processor間相同層級，互相指派任務
+- Asymmetric: master- slave架構，由主端調派任務
+
+- Hyperthreading

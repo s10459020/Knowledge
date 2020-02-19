@@ -1,0 +1,80 @@
+----------【 File System 】
+> Architecture:
+	Application ----------> File System --------------> Storage System ----------------> Physical Device
+	              (fwrite)               (Block write)     (IO request)->(Control Signal)
+				  
+> File: 是有名子的一群information的集合體
+	> attribute:
+		> name: 檔名
+		> identifier: 唯一的識別碼
+		> type: 檔案類型，OS只需辨別exe, direct file等少數的種類就好
+		> location
+		> size
+		...
+	> i_node by 4.4BSD
+		> ref_count: 被多少東西指
+		> direct block: 直接存著資料
+		> single indirect: 一元指標
+		> double indirect: 二元指標
+		> triple indirect: 三元指標
+
+> Access:
+	Sequential Access: read_next、write_next，只能依序存取
+	Direct Access: read(i), write(i)
+	Index_based Access: 插入flag到各地，透過flag存取
+	
+> Directory Structure:
+	Disk=> partition / partition / partition... (ex: C:, D:)
+	partition(Volume)=> 一個volume有不同的file system
+		> ex: SystemV=> boot block/ super block/ i_list/ dir,data blocks
+		> i_list=> i_node/ i_node/ i_node
+		
+> Directory
+	> Single_Level directory: 所有人共用一層，File互相混雜
+	> Two_Level Directory: 分成Master File Directory(MFD)與User File Directories(UFD's)兩層
+	> Tree_Structured Directories: 變成Root Directory與Subdirectories的樹狀結構
+	> Acyclic_Graph Directories: 有向無環，多個路徑下可定址到同個File
+		> link: 一層指向另一層，不用同一層只要不造成迴圈
+		> hard_link: 兩個directory真正指向同個檔案(ref = 2)
+		> soft_link(symbolic link):創造一個捷徑檔案，指向真正檔案(ref = 1,1)
+	
+> File_System Mounting: 將file_system當一個directory一般掛載著
+> File Sharing
+	> Multi_User: Owner, Group, Other...
+	> Remote File System:
+		> ftp
+		> remote directory access: 分散式系統，共享file system
+		> brower base access: www
+		> client_server model: client access server file
+		> tool:
+			> Domain Name System(DNS)
+			> Network Information Service(NIS)
+			> Common Internet File System(CIDS)
+			> Lightweight Directory_Access Protocol(LDAP)
+			
+	> Failure
+	> Consistency Semantics: 多使用者同時使用File時能否知道對方改變的內容
+		> UNIX Semantic: visible on change
+			tables of opened file -> system open file table -> i_node
+			tables of opened file -> system open file table ----^
+		> Session Semantics: visible on close
+		> Immutable_Shared_Files Semantics: can't change
+
+> Protection
+	> Access Control List(ACL): 存取權限表，紀錄每個人對此檔案的每個操作權限
+		> 可應付複雜的需求
+		> 太大、ACL大小不一定
+	
+	> A Condensed Version of ACL: 用group取代個人，一個使用者可參加多個group
+		> Owner, Group, Universe
+		
+	> file passward: 給每個檔案用密碼保護
+	
+> Implementation
+	> Directory Implementation
+		> Linear List
+		> Hash Table
+	> Space Allocation
+		> Contiguous Allocation
+		> Linked Allocaiton
+		> Indexed Allocation

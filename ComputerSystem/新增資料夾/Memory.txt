@@ -1,0 +1,21 @@
+// 8_9
+
+- Relevant:
+	> Storage: 電腦的儲存單位，下面列出的種類由快而慢
+		primary storage: momery以上
+			> register (< 1KB, 0.5ns): 最小也最快，在ALU與其他電路作為儲存單位
+			> cache (< 16KB, 10ns): 為平衡memory與CPU速度而出現，較memory快速但更小
+			> memory (< 64GB, 200ns): 為電腦主要的儲存單位，MU的實作，所有資料需放入此才能被CPU使用
+				- Relevant:
+					> Memory Mapping I/O
+					
+		Secondary storage: momery以下
+			> SSD: 較傳統硬碟快速
+			> Magnetic Disk(磁盤) (< 10TB, 5ms): 如硬碟，有很大的儲存空間，是memory的主要存放地方
+		
+		Tertiary storage: 外接裝置(I/O)
+			> Optical Disk: 如CD
+			> Magnetic Tapes(磁帶): 如軟碟
+			
+		> Cache/Buffer: 將data往上搬移加快處理速度，往下搬移做備份
+			> 會有Coherency & Consistency問題

@@ -1,0 +1,23 @@
+表示方法
+	> 文字
+		ex: sum()
+			1. 初始化一個變數sum為0
+			2. 從頭開始一個一個加到sum裡
+			3. 回傳sum
+		
+	> flowchart 流程圖
+		> 箭頭: 表示流程。
+		> 圓框/圓形: 表示開頭/結尾。
+		> 方框/矩形: 表示一系列操作。
+		> 尖框/菱形: 表示判斷，以通往不同流程。
+		> 平行四邊形: 表示I/O。
+		
+	> pseudocode 虛擬碼
+		> 宣告 (declaration): 可用let _ as 或 _ is a _
+		> 指派 (assignment): 可用set _ to 或 a <- b
+		> 選擇 (selection): 可用if (_) then 或 switch_
+		> 迭代 (iteration): 可用while (_) do 或 for i (_ to _ (step _)) do 或 foreach e(_) do
+		> 函式 (function):  可用func _(_, _): int
+		> 類別 (class): 可用class _: 或struct _:
+		> 陣列 (array): 可用_[i]
+	

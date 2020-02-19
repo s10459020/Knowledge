@@ -1,0 +1,8 @@
+Introduction: 找出理想的子集合問題，有許多種變體。
+
+Fractional Knapsack Problem: 物品可分解
+	Situation: Greedy策略，從最高價值開始放直到空間滿。
+	Time Complex: O(n) 
+	
+0/1 Knapsack Problem: 物品不可分解，只能決定取或不取
+

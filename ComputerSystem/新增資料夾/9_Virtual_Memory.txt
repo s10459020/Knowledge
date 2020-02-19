@@ -1,0 +1,99 @@
+----------【 Virtual Memory 】
+- Motivation: memory數量稀少，而program設計時又會將資料想像成連續堆放
+- Goal: 實現memory的理想抽象給上層，利用memory manage技術對應真實底層儲存單元如memory、disk
+- Advantage: 
+	1. 等效於有無窮的memory，能有效利用Disk搭配
+	2. process永遠認為自己的程式為連續完整的，方便編程	
+
+[ Demand Paging ]
+> 將page放在Disk，需要時才載入memory以節省更大資源
+- Define:
+	> Lazy Swapping: 只有在page被需要時才進行載入
+	> valid_invalid bit: 是否合法，代表page是否已存在於memory
+
+- Algorithm:
+	1. reference發出，到page table尋找對應的page
+	2. 檢查是否合法，若合法則正常定址，不正常進入3.
+	3. Page Fault: 發出Trap通知要載入特定page
+	4. OS將page從disk移至memory，並修改page table
+	5. 重新執行同個指令，回到2.
+
+- Implement:
+	> Pure Demand paging: 直到Page Fault的當下才載入page
+	> Pre_Paging: 透過資訊判斷何種可能要載入，提前先載入
+	> Non_Uniform memory access: 記憶體有多個單元，而邏輯上位置卻是統一的，所以讀取當地的記憶體較外地快
+	
+	> Page Replacement Algorithm: 改善Page的replace機制以減少Page fault時間
+		> dirty bit: 修改過的page會被標記，當要移出時若未修改過則直接覆蓋即可
+			
+		> reduce algorithm data: 減少演算法的輸入，以避免大量address資料計算起來不易
+			> no offset, only page number // 可減少到1/2
+			> 相鄰的相同page不會發生錯誤，可省略計算 // 可減少到數千分之一
+		> Belady's anomaly: Page fault有可能不會因為page上限增加而減少
+		
+		- Algorithm:
+			> FIFO Algorithm: 挑最舊的replace
+			
+			> Optimal Algorithm(OPT): 挑未來最久要用的replace
+				> 因無法預估未來，這個相當於無法實現
+			
+			> Least_Recently_Used Algorithm(LRU): 挑最近最久沒出現的replace
+				> OPT: 概念為OPT的相反，往後挑最遠變往前挑最遠
+				> FIFO: 有類似的目標，但LRU允許使用過的page往前排，而FIFO不行
+				- Implement:
+					Counter: 新增邏輯時鐘，但Overhead太大
+					Stack: 需要有硬體支援
+			
+			> Page Buffering: ???
+				
+			(LRU Approximation Algorithm): 挑近似於LRU的方法，以達到類似的效果
+			> Additional-Reference-Bit Algorithm: 紀錄每個周期table是否有被使用過，挑選其中最舊週期的page
+				> 以一個額外bit紀錄此週期是否有被使用
+				> 每個周期都會shift到旁邊儲存，紀錄此週期的使用情況
+			
+			> Second-Chance (Clock) Algorithm: 將page串成一個queue，輪流詢問直到找到第一個機會用光的
+				> 若有被使用到，則會增加機會(0->1 ，1則不動)
+				> 若有被找到，則會減少機會(1->0，0則被挑選)
+				
+			> Enhanced Second-Chance Algorithm: 透過dirty與recently兩個狀態來決定挑選順序
+				>(0,0)- not recently, not dirty
+				>(0,1)- not recently,     dirty
+				>(1,0)-     recently, not dirty
+				>(1,1)-     recently,     dirty
+				
+			> Counting-Based Algorithms: 從數量去判斷何種該被選擇
+				> Least Frequently Used Algorithm(LFU): 最少用的丟掉
+					> Aging: 活越久的增加被丟掉的機會，避免常用的永遠丟不掉
+				> Most Frequently Used Algorithm(MFU): 最常用的丟掉
+
+	> Frame Allocation Algorithm: 規劃程式允許的frame數量，以減少Page fault發生
+		> Fixed Allocation: 分配後就不再調整
+			> 相同數量
+			> 相同比例
+		> Dynamic Allocation: 動態分配
+			> minimun frame: 至少要分配給每個程式最小值frame才可運作
+			> global allocation: 當需要時可從任意的frame(也可搶別人的)索取
+			> local allocation: 有自己的frame區塊，不影響彼此
+	
+	> Kernel Memory Allocation: 有些硬體與操作必須要使用真正連續記憶體，kernel需保留一塊共用的連續記憶體空間
+		> Buddy System: 將一塊區域透過不斷除二的方式給予適當大小的記憶體，並可任意與其他分割區塊結合
+		> Slab Allocation: ???
+		> I/O Interlock: 像DMA等硬體在操作Memory時為避免到一半page被swapping而導致的錯誤，可搬移到system memory或lock住
+		
+- Issue:
+	> Page fault過久: 一次的Page Fault約為平常執行的數十萬倍時間
+	> Cost in restarting instruction: 一個指令可能會發生多個page fault，而發生後會不斷restart反而導致浪費
+	> Block-Moving Assembly Instruction: 搬移data時發生page fault可能會讓資料遺失
+	> Addressing Mode: 同2，但是是發生在address的計算中
+	> Thrashing: 當為了增加CPU使用率而讓記憶體剩餘量極少時，會發生大量Page fault而讓CPU使用率變少
+	> Locality Model: page間有很緊密相關性，程式等同在locality間跑來跑來
+		> working_set: 透過一定時間檢查使用過的page，以近似locality
+		> working_set Model: 確保memory > working_set，就能保持安全
+	> Memory_Mapped Files: 讓File放入memory，對File的操作等同對memory的操作，加速操作速度
+		> shared memory: 打開相同File時相當於shared memory
+	> Memory_mapped I/O: 讓I/O有著跟memory一樣抽象的虛擬位置，能用相同指令操作memory與IO
+	> Program Structure: 若使用者撰寫時有考慮到demand page，則可避免很多的page fault
+	> Real_Time Proecssing: 當Real time的程式在跑時也許會因swapping而無法趕上時間
+	
+[ Demand Segmentation ]
+> 大小不一、透過種類去切割

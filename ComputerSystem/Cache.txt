@@ -1,0 +1,13 @@
+Introduction: 用以彌補memory與CPU速度相差過大的問題，速度較memory快的儲存單位(MU)
+
+Graphic:				
+		  Cache number   Tag   Block
+	set |-      0      | 001 | 001101 | --> 對應memory的"001""0"的block
+		|-	           | 011 | 101001 | --> 對應0110
+			    1      | 110 | 111110 | --> 對應1101
+	
+Mapping Function:
+	direct-mapped: 每個set只有一個tag/block，簡單實做
+	full-associative: cache只有唯一的set，包含著所有的tag/block
+	set-associative: 每個set可容納n個tag/block
+	

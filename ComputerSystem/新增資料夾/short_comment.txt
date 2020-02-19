@@ -1,0 +1,212 @@
+[CH5 process_scheduling]
+RR
+	Turnaround Time
+	Waiting Time
+Multilevel Queue
+(Thread Scheduling)
+Multilevel Processor
+	SMT(Symmetric Multithreading)
+	NUMA	
+	VLIW
+Multicore Processor
+Virtualization
+Real-Time CPU
+Earliest Deadline Frist
+Proportional share
+Deterministic modeling
+Queueing Models
+Simulation
+
+[CH6 Synchronization]
+Producer/Consumer
+Race Condition
+Critical Section
+Mutual Exclusion
+Peterson's Solution
+Multiple Process Solution
+Synchronization Hardware
+Mutex Locks
+Semaphores
+Deadlock & Starvation
+Priority Inversion
+Binary Semaphore
+Bounded Buffer
+Reader and Writers
+Dining Philosophers
+Critical Regions
+Monitor
+atomic(Memory Transaction)
+
+[CH7 DeadLock]
+1 Mutual Exclusion
+2 Hold and wait
+3 No Preemption
+4 Cirular wait
+5 Resource Allocation Graph
+6 Banker's Algorithm
+7 Signal Instance/Resource Type
+8 Multiple Instance/Resource Type
+Deadlock Prevention (12345)
+Deadlock Avoidance (56)
+Deadlock Detection (78)
+Deadlock Recovery
+	Termination
+	Resource Preemption
+	Combined Approaches
+
+[CH8 Memory Management]
+Binding Time
+MMU(Memory Management Unit)
+Dynamic Loading
+Static Linking
+Overlays
+Swapping
+Contiguous Allocation- Single User
+Contiguous Allocation- Multiple User
+Fragmentation
+Paging
+	Basic Method
+	Hardware Support
+	Protection
+	Sharing
+TLB
+Multilevel Paging
+	Two Level Paging
+	N Level Paging
+Hashed Page Table
+Inverted Page Table
+Segmentation
+	Hardware Support
+	Protection
+	Sharing
+	Fragmentation
+Page Segmentation
+	IA-32 Segmentation
+		LDT(Local Descriptor Table)
+		GDT(Global Descriptor Table)
+	x86-64 
+Virtual Memory
+
+
+[CH9 Virtual-Memory Management]
+Demand Paging - Lazy Swapping
+Demand Segmentation
+Page Pault
+	ex1: Cost in restarting instruction
+	ex2: Block-Moving Assembly Instruction
+	ex3: Addressing Mode
+Shared pages
+Zero-fill-on-demand
+Page Replacement
+	FIFO Algorithm
+	Optimal Algorithm(OPT)
+	Least-Recently-Used Algorithm(LRU)
+		Counters
+		Stack
+		Additional-Reference-Bit Algorithm
+		Second-Chance (Clock) Algorithm
+		Enhanced Second-Chance Algorithm
+		Counting-Based Algorithms
+			Least Frequently Used Algorithm(LFU)
+			Most Frequently Used Algorithm(MFU)
+Page Buffering
+Frame Allocation - Single User
+Frame Allocation - Multiple User
+Non-Uniform Memory Access(NUMA)
+Thrashing
+Locality Model
+Working-Set Model
+Page-Fault Frequency
+Memory-Mapped Files
+Memory-Mapped I/O
+Kernel Memory Allocation
+	The Buddy System
+	Slab Allocation
+Other Consideration
+	Pre-Paging
+	Page Size
+	TLB Reach
+	Inverted Page Table
+	Program Structure(Array cause page fault)
+I/O Interlock
+Real-Time Processing
+
+
+[CH10 File System]
+File attribute
+File Operations
+Access Method
+	Sequential Access
+	Direct Access
+	Index-Based Access
+Directory Structure	
+	i-node
+Directories
+	Single-Level Directory
+	Two-Level Directory
+		Master File Directory(MFD)
+		User File Directories(UFD's)
+	Tree-Structured Directory
+	Acyclic-Graph Directories
+		Hard Link
+		Symbolic Link(Soft Link)
+	General Graph Firectory
+File-System Mounting
+File Sharing
+	Remote File Systems
+		FTP
+		Client-Server Model
+		DNS
+	Failure Modes
+	Consistency Semantics
+	UNIX Semantics
+Protection
+Access Control List(ACL)
+
+
+[CH11 Mass-Storage Structures]
+Magnetic Disks
+Solid-State Disks(SSD)- Flash-Memory Drives
+Magneetic Tapes
+Disk Structure
+	Constant Linear Velocity(CLV)
+	Constant Angular Velocity(CAV)
+Host-Attached Storage
+Network-Attached Storage
+Storage-Area Network
+Disk Scheduling
+	First-Come-First-Serve(FCFS)
+	Shortest-seek-time-first(SSTF)
+	Scan (or Elevator) Algorithm
+	LOOK and C-LOOK Algorithms
+Disk Management
+	Disk Formatting
+	Raw Disks
+	Boot Block
+		Master Boot Recorod(MBR)
+
+
+[CH12 I/O System]
+I/O Hardware
+	Port
+	Bus
+	Controller
+	Host Adaptor
+Memory Mapping I/O
+Polling - Programmed I/O
+Interrupt-Driven Handling
+Direct Memory Access
+Application I/O Interface
+	Interface
+	Device Driver
+Block
+Character Devices
+Network Devices
+Clocks
+Timers
+Blocking and Nonblocking I/O
+Kernel I/O Subsystem
+
+
+[CH13 Distributed Systems]
+Distributed Synchronization

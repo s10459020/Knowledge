@@ -1,0 +1,125 @@
+----------【 File System 】
+> Architecture:
+	Application ----------> File System --------------> Storage System ----------------> Physical Device
+	              (fwrite)               (Block write)     (IO request)->(Control Signal)
+				  
+> File: 是有名子的一群information的集合體
+	> attribute:
+		> name: 檔名
+		> identifier: 唯一的識別碼
+		> type: 檔案類型，OS只需辨別exe, direct file等少數的種類就好
+		> location
+		> size
+		...
+
+> Access:
+	Sequential Access: read_next、write_next，只能依序存取
+	Direct Access: read(i), write(i)
+	Index_based Access: 插入flag到各地，透過flag存取
+	
+> Directory Structure:
+	Disk=> partition / partition / partition... (ex: C:, D:)
+	partition(Volume)=> 一個volume有不同的file system
+		> ex: SystemV=> boot block/ super block/ i_list/ dir,data blocks
+		> i_list=> i_node/ i_node/ i_node
+		
+> Directory
+	> Single_Level directory: 所有人共用一層，File互相混雜
+	> Two_Level Directory: 分成Master File Directory(MFD)與User File Directories(UFD's)兩層
+	> Tree_Structured Directories: 變成Root Directory與Subdirectories的樹狀結構
+	> Acyclic_Graph Directories: 有向無環，多個路徑下可定址到同個File
+		> link: 一層指向另一層，不用同一層只要不造成迴圈
+		> hard_link: 兩個directory真正指向同個檔案(ref = 2)
+		> soft_link(symbolic link):創造一個捷徑檔案，指向真正檔案(ref = 1,1)
+	
+> File_System Mounting: 將file_system當一個directory一般掛載著
+> File Sharing
+	> Multi_User: Owner, Group, Other...
+	> Remote File System:
+		> ftp
+		> remote directory access: 分散式系統，共享file system
+		> brower base access: www
+		> client_server model: client access server file
+		> tool:
+			> Domain Name System(DNS)
+			> Network Information Service(NIS)
+			> Common Internet File System(CIDS)
+			> Lightweight Directory_Access Protocol(LDAP)
+			
+	> Failure
+	> Consistency Semantics: 多使用者同時使用File時能否知道對方改變的內容
+		> UNIX Semantic: visible on change
+			tables of opened file -> system open file table -> i_node
+			tables of opened file -> system open file table ----^
+		> Session Semantics: visible on close
+		> Immutable_Shared_Files Semantics: can't change
+
+> Protection
+	> Access Control List(ACL): 存取權限表，紀錄每個人對此檔案的每個操作權限
+		> 可應付複雜的需求
+		> 太大、ACL大小不一定
+	
+	> A Condensed Version of ACL: 用group取代個人，一個使用者可參加多個group
+		> Owner, Group, Universe
+		
+	> file passward: 給每個檔案用密碼保護
+	
+> Implementation
+	> Directory Implementation
+		> Linear List
+		> Hash Table
+	> Space Allocation
+		> Contiguous Allocation
+		> Linked Allocaiton
+		> Indexed Allocation
+		
+	【 inode 】
+- Motivation: 
+	> 硬碟的最小區域Sector，多個Sector組成一個block，為硬碟讀取的最小單位。
+	> 文件儲存於數個block，而描述文件資訊的元訊息就是inode，一個文件對應一個inode。
+
+- Information:
+	> inode data:
+		> 沒有儲存文件名，系統用inode號碼來辨識inode
+		> File size		// 檔案大小
+		> User ID		// 擁有者ID
+		> Group ID		// 擁有群組ID
+		> Authorized	// 讀寫權限
+		> time slice	// 時間戳
+			> ctime 	// last inode change time
+			> mtime 	// last file modify time
+			> atime 	// last file access time
+		> ref_count		// 多少文件指向此inode
+		> direct block		// 直接存著block的位置，可直接存取
+		> single indirect	// 一元指標
+		> double indirect	// 二元指標
+		> triple indirect	// 三元指標
+	
+	> inode location:
+		> 硬碟分成兩部分，block區與inode區(inode table)。
+		> 通常大小為128byte, 256byte... 
+		> inode 有數量上限，所以可能會有inode用光而卻仍有空間的情況
+		
+	> inode fetch:
+		> 每個inode有自己的號碼，系統用此號碼來辨識
+		> 打開文件分成三步驟: 找到文件名對應的inode號碼，獲取inode訊息，找到block取得資訊
+		
+	> directory: 目錄文件，由一系列的dirent(目錄項)組成，每個dirent包含inode號碼與文件名。
+	> hard link: 硬連接，文件直接對應於inode，數個文件可對應相同inode。
+			file A --> inode
+			file B ------^
+		> 一般情況下是一個文件對應一個inode
+		> 每有一個文件對應，inode的link就增加
+		> 當文件產生時，會指向inode並給inode link +1。
+		> 當文件修改時，相當於對inode指向的block做修改，所有文件皆會看到更動
+		> 當文件刪除時，只是將對應inode的link -1而已，不會影響其他文件。
+		> 若inode link = 0，對應的inode與block都會回收。
+		
+	> soft link: 軟連接，文件A與文件B對應不同的inode，但A的內容是B文件的路徑，會直接對應到B文件。
+			file A --> inode --|
+			   v---------------|
+			file B --> inode
+		> 當文件A產生時，會取得新的inode並指向B文件，而B對應的inode link不會增加。
+		> 當文件A刪除時，僅歸還A對應的inode。
+		> 當文件B刪除時，不僅歸還B的inode，並且在A進行讀取時會產生 "no such file or directory" 警告
+		

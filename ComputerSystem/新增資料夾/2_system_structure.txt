@@ -1,0 +1,106 @@
+【 System calls 】
+【 System program 】
+【 System Design 】
+【 OS Structure 】
+【 Others 】
+
+----------【 System calls 】
+
+register
+memory:
+stack: 將執行的process & context 放入
+
+
+	[ type ]
+
+	- Process & Job Control:
+系統要提供幾種方法操作process
+end & abort 	//正常與不正常結束
+load & execute	//載入與執行
+create & terminate	//創建與中斷
+process attributes set/get
+wait event
+...
+	
+	- File Management:
+create & delete
+open & close
+read & write
+...
+
+	- Device Management
+request & release
+read & write
+
+	- Communication
+message passing 
+(open, close, accept connections. 
+ send, receive...)
+  > easy implementation
+  > no conflict
+  > throught different mechine
+  > waste time(cope data)
+
+shared memory 
+(memory mapping, process synchronization...)
+  > fatser
+  > probable conflict(read/write in same time)
+	
+
+----------【 System program 】
+
+	[ type ]
+	- File Management
+	- Status information
+	- Loader
+	...
+
+
+----------【 System Design 】
+
+	[ Gold ]
+每個作業系統都會根據目標實作，如:
+user: easy of use
+system: reliable
+
+
+	[ Implement in High-Level Language ]
+優點: 易實作、理解、修改
+缺點: 效能較低，程式較大
+
+	
+----------【 OS Structure 】
+	[ Simple Structure ]
+	// 簡易架構，想到就加上功能
+缺點: 隨著架構增加而變得雜亂不堪，難以維護
+
+	[ Layered Approach ]
+	// 階層架構，上層完全包含下層
+優點: 模組化，維修方便
+缺點: overhead，架構難設計
+
+	[ Microkernel ]
+	// 微核心系統，將核心負責的工作縮小
+	// 將不必要的功能移出成為program
+優點: 安全性高，系統易移植
+
+	[ Modules ]
+	// 模組化，將功能實作成模組可方便移植
+	// 核心模組等同於Microkernel
+優點: 可動態讀取模組，易移植
+
+	[ Hybrid System ]
+	// 組合不同的structure
+Example: Mac OS X (BSD + Mach)
+Example2: iOS (Services +Core OS)
+Example3: Android (Linux Kernel) (design by Open Handset Alliance)
+
+
+----------【 Others 】
+	[ System Generation (SYSGEN) ]
+根據硬體及使用者決定去客製化系統
+給予更加彈性的建構系統
+
+	[ System Booting ]
+在電腦開機後會被載入至電腦內
+需要 bootstrap

@@ -1,0 +1,106 @@
+Procecss
+- state
+- PCB
+	Scheduling
+	Operation
+	Communication
+	-IPC
+		Shared Memory
+		Message Passing
+	-Non IPC
+		RPC
+		Socket
+
+
+----------【 Process 】
+
+作業系統中最小單位
+Process: 正在執行中的程式
+Program: 未執行的程式，也稱為程式碼
+
+	[ State ]
+
+new: 取得硬體資源(memory...)
+ready: 隨時可以開始
+running: 正在使用中
+waiting: 因I/O或中斷而等待工作完成
+termination: 歸還資源
+
+CPU(running)
+	-> I/O request-> I/O queue(waiting)-> I/O-> queue(ready)
+	-> time up-> queue(ready) 
+	-> fork-> child execute(waiting)-> child terminate-> queue(ready)
+	-> interrupt(wait)-> queue(ready)  
+
+
+	[ PCB(Process Control Block ]
+
+存著Process使用硬體的資訊，如:
+	CPU的PC、Register...
+	Memory的資訊
+	I/O的資源狀況
+
+
+----------【 Process Scheduling 】
+
+Long-tern: 抉擇何種Process可進入系統(如開啟exe檔)
+Short-tern: 抉擇何種Process可從ready進入running
+Mid-tern: 抉擇何種Process需要被暫時存放或中止，又稱swap process
+
+	[ Context Switch ]
+用在Process上: PCB
+用在Thread上: 不用做Memory等交換
+
+
+----------【 Process Operation 】
+
+Create
+Duplication (fork, CreateProcess...)
+terminal
+
+
+	[ IPC(Inter-process Communication) ]
+Symmetric[ Symmetric, Asymmetric ] (相等任務 or 不同任務)
+Block    [ Blocking, Nonblocking ] [ send, receive ] (Blocking send and recv 又稱 Rendezvous) (Blocking 可實作RPC)
+Capacity [ Zero, Bounded, Unbounded ] (zero必須為Rendezvous)
+ 
+
+Termination (導致另一方被block住)
+	- Notify
+	- Terminate other side
+
+Lost message (掉封包)
+	- OS resend
+	- Sender resend
+	- timeout
+	- mutiple copies
+
+Scrambled message (雜訊干擾)
+	- CRC
+ 
+
+Shared Memory
+	- 快速
+	- 必須是同個機器
+	- 作業系統要提供共享記憶體的功能
+
+Message Passing
+	- 需複製一份新的
+	- 方便實作
+		Rendezvous(send和recv皆blocking)
+	- Direct Communication
+		直接存取對方(Send P, Receive Q)
+	- Indirect Communication
+		透過mail box(Send box, Receive box)
+
+Socket
+	- 可作用於不同機器
+	- TCP
+	- UDP
+	- RPC(Remoto Procedure Call)
+
+Pipe
+	- Unidirectional/ Bidirectional (單/雙向)
+	- Half/ Full Duplex (單/雙工)
+
+RPC(行程外通訊，待補)

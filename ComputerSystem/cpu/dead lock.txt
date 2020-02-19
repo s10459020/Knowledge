@@ -1,0 +1,167 @@
+- DeadLock
+	> 大家都在等別人擁有的Resource，而導致整個停滯不前
+	> Resource:
+		> Physical: CPU、memory...
+		> Logical: file、semaphores...
+		
+	- Necessary Condition  // 四種關係都存在的時候，才會造成Deadlock
+		1. Mutual Exclusion: 一定要有非共享的資源
+		2. Hold and Wait: process在擁有資源的情況下等待資源
+		3. No Preemption: 不可搶佔資源，只能等待
+		4. Cirular Wait: 造成迴圈等待
+		
+	- Solution		
+		- Prevention  // 讓至少一個Condition永遠不發生
+			> 用在極度不可發生Deadlock的場合，如攸關生命的系統
+			> Mutual Exclusion:  // 讓資源共享，不發生wait
+				> 要讓所有資源共享永遠不互斥不太可能(螢幕、PC register)
+			
+			> Hold and Wait:  // 保證能hold全部才hold，必免wait時有部分hold
+				1. 將 A->B->C 分成 A->B 與 B->C ，減少Deadlock可能性
+					> 一樣會 Deadlock
+					> 在斷點時資源可能被搶走、修改
+				2. 只在 A, B 能一次hold時才執行，否則將一直wait這個情況
+					> Low Utilication
+					> Starvation
+			
+			> No Preemption:  // 搶走resource而不wait到工作結束
+				1. 當下直接搶
+					> 像write disk等操作不能硬搶，否則會讓資料壞掉
+				2. 對方waiting時才能搶，否則等待
+					> 確保對方並沒有running
+			
+			> Cirular Wait:  // 防止迴圈發生，確保一定有一個process不卡住
+				1. 給資源編號，當要求資源時只能hold小的種類，並wait大的種類
+					> 確保wait的資源順序永遠比所有hold的大，以達成單方向wait
+					> 若想取得較小的資源，則必須丟棄所有hold的資源重新取得
+					> Order順序難定義，會隨著程式設計師的喜好而有所不同
+			
+			> Resource Allocation:
+		
+		- Avoidance  // 透過額外資訊動態資源分配以防止發生Deaklock，永遠確保安全
+			> 用在不太能發生Deadlock的場合，寧可多花些資源計算
+			> 類似於Recovery裡的Detection，頻率很高且在分配之前先行計算
+			1. Store information  
+				> # of available  // 系統還可分配的資源
+				> # of allocated  // 已分配的資源
+				> max of resource  // process提前宣告的資源最大使用量
+				
+			2. IS SAFE? Find Safe Sequence  // 找出安全路徑，使資源分下去後絕對能逐一完成工作
+				> for all Pi , need(Pi) <= available + allocated(Pi-1) + allocated(Pi-2)...
+				> need(Pi) = max(Pi) - allocated(Pi)
+				> unsafe != Deadlock
+				
+			3. STILL SAFE? Allow Request or Wait
+				> Safe Sequence => 若分配後可達成Safe Sequence，則允許Pi的request
+				> 若分配request會使Safe Sequence無法成立，則只能wait
+			
+			> Resource Allocation Graph(Single Instance):
+				- Information:
+					> Claim Edge: Pi ...> Ri
+					> Request Edge: Pi ---> Ri
+					> Assignment Edge: Pi <--- Ri
+					
+				- Solution:
+						R1 ---> P1 ...> R2
+						 ^----- R2 .....^
+			
+					1. cycle maybe cause Deadlock => 不允許 request!
+						R1 ---> P1 ...> R2
+						 ^----- R2 <----|
+						 
+					2. waiting P1 finish
+						R1 ---> P1 <--- R2
+						 ^----- R2 .....^
+						 
+					A: 只允許P1 request，P2若發出時須wait
+					
+			> Banker's Algorithm(Multiple Instance):
+				- Information:  // m Resource, n Process
+					> Available[m]  
+					> Max[n, m]  
+					> Allocation[n, m] 
+					> Need[n, m]  
+					
+					> Work[m] // 暫時存放，代表計算過程的Available
+					> Finish[n] // 暫時存放，代表每個procress有沒有滿足Need並足以執行完畢釋放資源
+					
+				- Algorithm:  // 能知道當前狀態是否為安全
+					1. Work = Avaliable, 
+						\ Finish[0 to n] = False
+					2. Find i satisfy below then goto 3., or goto 4.:
+						(1) Finish[i] = F
+						(2) Need[i] <= Work
+					3. Work = Work + Avaliable[i],
+						\ Finish[i] = True,
+						\ goto 2
+					4. IF Finish[0 to n] == True => SAFE 
+					
+				- Solution:
+					1. If Request > Need: Process說謊，發生Trap
+					2. If Request > Avaliable: 不用測，直接wait
+					3. Otherwise: 假設request通過並分配後，透過Banker's Algorithm去判斷是否Safe
+						> 假設request通過:
+							1. Avaliable = Avaliable - Request
+							2. Allocation = Allocation + Request
+							3. Need = Need - Request
+							4. Banker's Algorithm
+						
+						> Safe: request可接受
+						> Unsage: wait
+		
+		- Recovery  // 發生Deadlock後才解決問題
+			> 雖然發生後會卡住影響系統，但能有很高的resource utilization
+			> Overhead:
+				> maintenance information
+				> detection algorithm
+				> potential loss(restart Pi, preemptive...)
+			
+			1. Detection  // 首先先偵測到發生Deadlock
+				- Wait-For Graph(Single Instance)
+					> Resource Allocation Graph的簡化 // 只剩 Pi--->Pj 一種模式
+					> 較前者演算法快
+					
+				- Multiple Instance Algorithm
+					> 類似於Banker's Algorithm
+					
+					- Information:
+						> Available[m]  
+						> Allocation[n, m] 
+						> Request[n, m]  // 當前的request
+					
+					- Algorithm
+						// note: 步驟裡面有request <= work的判定感覺不合理
+						//		(為何有需求卻沒供應)，但第一次通常會對request=0的做判定
+						1. Work = Available,
+							\ IF Allocation[i] == 0, THEN Finish[i] = True,
+							\ IF Allocation[i] != 0, THEN Finish[i] = False
+						2. Find i satisfy below then goto 3., or goto 4.:
+							(1) Finish[i] = F
+							(2) Request[i] <= Work
+						3. Work = Work + Allocation[i],
+							\ Finish[i] = True,
+							\ goto 2
+						4. IF Finish[i] == False => Pi has in Deadlock! 
+		
+			2. Recovery  // 發現Deadlock後，著手進行解決
+				- Termination  // 透過殺process解決
+					1. Kill all of Deadlock membere!
+					2. Kill one by one
+						> how to choose?
+				- Resource Preemption  // 透過暫時釋出resource解決
+					> how to choose?
+					> roll back
+					> starvation
+			
+		- Ignore  // 佛系Deaklock，不解決等下次重開就好了
+			> Deaklock影響不大時也可就這樣不管
+					
+		- Combined Approaches  // 依照不同層面的資料用不同方式維護
+			- example: 
+				> Kernel Internal Resource: Prevention
+				> Central Memory: Prevention
+				> Job Resource: Avoidance
+				> Swappable Space: Prevention
+				...
+				
+	
