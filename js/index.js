@@ -6,13 +6,16 @@ String.prototype.format = function() {
 	 return formatted;
 };
 
-function getQuery(){
+function getPathQuery(){
+	var queriesText = document.location.search.substr(1).split('&');
 	var queries = [];
-	  $.each(document.location.search.substr(1).split('&'),function(c,q){
+	queriesText.forEach(function(q){
 		var i = q.split('=');
 		queries[i[0]] = i[1];
-	  });
-	return queries;
+	});
+	
+	var path = queries["path"];
+	return path;
 }
 
 function parseJSON(data){
@@ -22,4 +25,73 @@ function parseJSON(data){
 	});
 	
 	return JSON.parse(predata);
+}
+
+function setHeader(title) {
+	$("#header").html(title); 
+}
+
+function setChapter(title, content) {
+	$("#chapter").append(
+		"<article class='main chapter'>" +
+		"	<section class ='chapter title'>{0}</section>".format(title) +
+		"	<section class ='chapter content word'>{0}</section>".format(content) +
+		"</article>"
+	);
+}
+
+function setOption(title, content, image, link) {
+	$("option").append(
+		// link
+		/*
+		var linkClass = (articleList[key]["directory"])
+			? "link"
+			: "";
+		var linkOnclick = (articleList[key]["directory"])
+			? "window.location.href='.?path={0}'".format(path + articleList[key]["directory"])
+			: ""
+			
+		article += 	"<article class='main article {0}' onclick=\"{1}\">"
+			.format(linkClass, linkOnclick);
+		*/
+		
+			//header
+			"<header class='article title'> {0} </header>".format(title) +
+			
+			//image
+			"<section class='article image'>" +
+			"	<image src='{0}'>".format(imgSrc) +
+			"</section>" +
+			
+			//content
+			"<section id='article_{0}' class='article content'>".format(articleList[key]["name"]) +
+			
+			"</section>" +
+			
+			// footer
+			"<footer></footer>" +
+		"</article>"
+	);
+	
+	/*
+	if (articleList[key]["content"]){
+		var articleURL = url + path + articleList[key]["content"];
+		$.ajax({ 
+			url: articleURL
+			,dataType : "html"
+			
+		}).done(function(data){
+			var json = parseJSON(data);
+			var content = "";
+			
+			content += "<ui>";
+			json.forEach(function(e){
+				content += "<li>{0}</li>".format(e);
+			});
+			content += "</ui>";
+			
+			$("#article_" + articleList[key]["name"]).append(content);
+		});
+	}
+	*/
 }

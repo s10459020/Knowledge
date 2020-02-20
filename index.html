@@ -1,9 +1,19 @@
+<script src="js/jquery.js"></script>
+<script src="js/index.js"></script>
+<script>
+	var url = 'https://s10459020.github.io/Knowledge/'
+	var path = url + "Knowledge/" + (getPathQuery()? 
+							getPathQuery():
+							"");
+							
+	console.log({url, path});
+</script>
+
+
 <!doctype html>
 <html>
-	<head>
-		<script src="js/jquery.js"></script>
-		<script src="js/index.js"></script>
-		<link rel="stylesheet" type="text/css" href="index.css">
+	<head id="head">
+		<link rel="stylesheet" type="text/css" href="Knowledge/index.css">
 	</head>
 	
 	<body>
@@ -11,167 +21,105 @@
 
 		<main id="main" class="body main">
 			<section id="chapter"></section>
-			<section id="article"></section>
+			<section id="option"></section>
 		</main>
-		
-		<script> // argument 
-			var url = 'https://s10459020.github.io/Knowledge/'
-			var query = getQuery();
-			var path = (query["path"])? (query["path"]): ("");
-		</script>	
-		
-		<script> // header
-			if (path != ".") {
-				var splitPath =  path.split("/");
-				var lastPath = splitPath[splitPath.length-1];
-			}
-			title = (lastPath)? (lastPath): ("Knowledge");
-			$("#header").html(title); 
-		</script>
-			
-		<script> // chapter	
-			$.ajax({
-				url: url + path + "main.json",
-				type : 'GET',
-				dataType : 'html',
-				success : function(data) {
-					var json = parseJSON(data);
-					
-					// chapter
-					var chapter;
-					json.forEach((e,i) => {
-						chapter = "<article class='main chapter'>";
-						chapter += "<section class ='chapter title'>{0}</section>".format(e.Title);
-						chapter += "<section class ='chapter content word'>{0}</section>".format(e.Content);
-						chapter += "</article>";
-						
-						$("#chapter").append(chapter);
-					});
-				} 
-			});
-			
-		</script> 
-		
-		<script> // article
-			var contentsAPI = "https://api.github.com/repos/s10459020/Knowledge/contents";
-			var contentsURL = (path)? (contentsAPI + "/" + path): (contentsAPI);
-			$.ajax({ 
-				url: contentsURL
-				,dataType : "html"
-				
-			}).done(function(data){
-				var rawList = $.parseJSON(data);
-				
-				var fileList = [];
-				rawList.forEach( function(element){
-					switch(element.name){
-						case "css":
-						case "js":
-						case "main.json":
-						case "imageNoFound.jpg":
-							break;
-						default:
-							fileList.push(element.name);
-					}
-				});
-				
-				var articleList = {};
-				fileList.forEach( function(element){
-					var elementSplited = element.split(".");
-					var name = elementSplited[0];
-					var extension = elementSplited[1];
-					switch(extension){
-						// directory
-						case undefined: 
-							if (articleList[name] == undefined)
-								articleList[name] = {};
-							articleList[name]["directory"] = element;
-							break;
-							
-						// image
-						case "jpg":
-						case "png":
-						case "gif":
-							if (articleList[name] == undefined)
-								articleList[name] = {};
-							articleList[name]["image"] = element;
-							break;
-						
-						// content
-						case "json":
-							if (articleList[name] == undefined)
-								articleList[name] = {};
-							articleList[name]["content"] = element;
-							break;
-					}
-				});
-				
-				console.log(articleList);
-				Object.keys(articleList).forEach(function(key){
-					var article = "";		
-					
-					// link
-					var linkClass = (articleList[key]["directory"])
-						? "link"
-						: "";
-					var linkOnclick = (articleList[key]["directory"])
-						? "window.location.href='.?path={0}'".format(path + articleList[key]["directory"])
-						: ""
-						
-					article += 	"<article class='main article {0}' onclick=\"{1}\">"
-						.format(linkClass, linkOnclick);
-					
-					
-					// header
-					article += "<header class='article title'>"
-						+ key
-						+ "</header>";
-					
-					
-					// image
-					var imgSrc = (articleList[key]["image"]) 
-						? (path + articleList[key]["image"])
-						: ("imageNoFound.jpg");
-						
-					article += "<section class='article image'>"
-						+ "<image src='{0}'>".format(imgSrc)
-						+ "</section>";
-					
-					
-					// content
-					article += "<section id='article_{0}' class='article content'></section>"
-						.format(articleList[key]["name"]);
-						
-					if (articleList[key]["content"]){
-						var articleURL = url + path + articleList[key]["content"];
-						$.ajax({ 
-							url: articleURL
-							,dataType : "html"
-							
-						}).done(function(data){
-							var json = parseJSON(data);
-							var content = "";
-							
-							content += "<ui>";
-							json.forEach(function(e){
-								content += "<li>{0}</li>".format(e);
-							});
-							content += "</ui>";
-							
-							$("#article_" + articleList[key]["name"]).append(content);
-						});
-					}
-					
-					// footer
-					article += "<footer></footer>"
-						+ "</article>";
-				
-					$("#chapter").append(article);
-				});
-				
-			}).fail(function(){
-				console.log("get fileList fail");
-			});
-		</script>
 	</body>
 </html>
+
+<script> //header
+	var pathSplit = path.split("/")
+	var header = pathSplit[pathSplit.length-2];
+	setHeader(header);
+				
+	console.log({pathSplit, header});
+</script>
+	
+<script> // chapter	
+	var data = "data.json";
+	var dataType = "html"
+	$.ajax({
+		url: path + data,
+		dataType : dataType
+	})			
+	.done(function(data){
+		var json = parseJSON(data);
+		
+		json.forEach((e,i) => {
+			chapter(e.title, e.content);
+		});
+	});
+	
+	console.log({pathSplit, header});
+</script> 
+
+<script> // option
+	var contentsAPI = "https://api.github.com/repos/s10459020/Knowledge/contents";
+	var contentsURL = (path)? (contentsAPI + "/" + path): (contentsAPI);
+	$.ajax({ 
+		url: contentsURL
+		,dataType : "html"
+		
+	}).done(function(data){
+		var rawList = $.parseJSON(data);
+		
+		var fileList = [];
+		rawList.forEach( function(element){
+			switch(element.name){
+				case "css":
+				case "js":
+				case "main.json":
+				case "imageNoFound.jpg":
+					break;
+				default:
+					fileList.push(element.name);
+			}
+		});
+		
+		var articleList = {};
+		fileList.forEach( function(element){
+			var elementSplited = element.split(".");
+			var name = elementSplited[0];
+			var extension = elementSplited[1];
+			switch(extension){
+				// directory
+				case undefined: 
+					if (articleList[name] == undefined)
+						articleList[name] = {};
+					articleList[name]["directory"] = element;
+					break;
+					
+				// image
+				case "jpg":
+				case "png":
+				case "gif":
+					if (articleList[name] == undefined)
+						articleList[name] = {};
+					articleList[name]["image"] = element;
+					break;
+				
+				// content
+				case "json":
+					if (articleList[name] == undefined)
+						articleList[name] = {};
+					articleList[name]["content"] = element;
+					break;
+			}
+		});
+		
+		Object.keys(articleList).forEach(function(key){
+			
+			// header
+			var title = key;
+			
+			// image
+			var imgSrc = (articleList[key]["image"]) 
+				? (path + articleList[key]["image"])
+				: ("imageNoFound.jpg");
+			
+		
+		});
+		
+	}).fail(function(){
+		console.log("get fileList fail");
+	});
+</script>
