@@ -3,31 +3,48 @@
 <script>
 	var url = 'https://s10459020.github.io/Knowledge/'
 	var path = (getPathQuery()) ? (getPathQuery()) : ("Knowledge/");
-							
-	console.log({url, path});
+	var pathSplit = path.split("/")
 </script>
 
 
 <!doctype html>
 <html>
-	<head id="head">
-		<link rel="stylesheet" type="text/css" href="Knowledge/index.css">
-	</head>
+	<head id="head"></head>
 	
 	<body>
-		<header id="header" class="body header"></header>
-
+		<a id="backJumper" class="header jumper"href="">
+			<header id="header" class="body header link"></header>
+		</a>
+		
 		<main id="main" class="body main">
 		</main>
 	</body>
 </html>
 
+<script> // css
+	var cssPath = "";
+	pathSplit.forEach(function (e){
+		if (e == "")
+			return;
+		cssPath += e + "/";
+		console.log(cssPath);
+		$("head").append("<link rel='stylesheet' type='text/css' href='{0}index.css'>".format(cssPath));
+	});
+</script>
+
 <script> //header
-	var pathSplit = path.split("/")
+	
+	// main
 	var header = pathSplit[pathSplit.length-2];
-	$("header").html(header);
+	$("#header").html(header);
+		
+	// backJumper
+	if (pathSplit.length > 2){
+		var backPath = path.substr(0, path.length - header.length - 1);
+		$("#backJumper").attr("href", "index.html?path=" + backPath);
+	}
 				
-	console.log({pathSplit, header});
+	console.log({pathSplit, header, backPath});
 </script>
 	
 <script> // main	

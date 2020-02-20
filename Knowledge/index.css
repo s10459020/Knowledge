@@ -23,6 +23,9 @@ footer {
     text-align: center;
 	color: var(--page-color-light);
 }
+	.header.jumper{
+		text-decoration:none;
+	}
 
 .body.main{
     background-color: var(--page-color-light);
@@ -65,12 +68,12 @@ footer {
 		border-radius: 10px;
 	}
 
-.main.article{
+.main.option{
 	background: var(--article-color-light);
 	margin-bottom: 20px;
 }
 
-	.article.title{
+	.option.title{
 		background: var(--article-color-dark);
 		padding: 10px;	
 		padding-left: 30px;
@@ -79,7 +82,7 @@ footer {
 		color: var(--article-color-light);
 	}
 
-	.article.image{
+	.option.image{
 		padding: 10px;
 		
 		float: left;
@@ -87,7 +90,7 @@ footer {
 		max-width: 300px;
 	}
 		
-	.article.content{
+	.option.content{
 		padding: 10px;
 		
 		float: right;

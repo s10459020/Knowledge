@@ -82,14 +82,14 @@ class Option{
 				
 		// footer
 		return "" +
-			"<article class='main article {0}' onclick=\"{1}\">".format(islink, onclick) +
-				"<header class='article title'> {0} </header>".format(title) +
+			"<article class='main option {0}' onclick=\"{1}\">".format(islink, onclick) +
+				"<header class='option title'> {0} </header>".format(title) +
 
-				"<section class='article image'>" +
+				"<section class='option image'>" +
 					"<image src='{0}'>".format(imgSrc) +
 				"</section>" +
 				
-				"<section class='article content'>" +
+				"<section class='option content'>" +
 					"<ui>" +
 						contents +
 					"</ui>" +
