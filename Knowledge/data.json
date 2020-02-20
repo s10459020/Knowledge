@@ -1,25 +1,25 @@
 [
-	{
-		type:chapter,
-		title:介紹,
-		content:\t這裡是s10459020放任何關於自己學過知識的資料庫!
-	}
+{
+type:chapter,
+title:介紹,
+content:這裡是s10459020放任何關於自己學過知識的資料庫!
+}
 
-	{
-		type:chapter,
-		title:使用方法,
-		content:\t本頁的主題為"Knowledge"，代表這一頁所介紹的內容。\n上面虛線框所代表的是與主題的內容有關的介紹。\n下面框框為相關連結，若滑鼠移過時框框會放大則代表可進一步進入連結\n祝你使用愉快！
-	}
+{
+type:chapter,
+title:使用方法,
+content:本頁的主題為"Knowledge"，代表這一頁所介紹的內容。\n上面虛線框所代表的是與主題的內容有關的介紹。\n下面框框為相關連結，若滑鼠移過時框框會放大則代表可進一步進入連結\n祝你使用愉快！
+}
 
-	{
-		type:option,
-		title:ComputerScience,
-		content:["演算法", "資料結構"]
-	}
+{
+type:option,
+title:ComputerScience,
+content:["演算法", "資料結構"]
+}
 
-	{
-		type:option,
-		title:ComputerSystem,
-		content:["作業系統", "Computer Archtecture"]
-	}
+{
+type:option,
+title:ComputerSystem,
+content:["作業系統", "Computer Archtecture"]
+}
 ]

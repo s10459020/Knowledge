@@ -34,22 +34,20 @@
 	console.log({pathSplit, header});
 </script>
 	
-<script> // chapter	
-	var data = "data.json";
+<script> // main	
+	var file = "data.json";
 	var dataType = "html"
 	$.ajax({
-		url: path + data,
+		url: path + file,
 		dataType : dataType
 	})			
 	.done(function(data){
-		var json = parseJSON(data);
+		var json = JSON.parse(data);
+		console.log(json);
 		
-		json.forEach((e,i) => {
-			chapter(e.title, e.content);
-		});
 	});
 	
-	console.log({pathSplit, header});
+	console.log({file, dataType});
 </script> 
 
 <script> // option
