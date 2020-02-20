@@ -2,9 +2,7 @@
 <script src="js/index.js"></script>
 <script>
 	var url = 'https://s10459020.github.io/Knowledge/'
-	var path = "Knowledge/" + (getPathQuery()? 
-							getPathQuery():
-							"");
+	var path = (getPathQuery()) ? (getPathQuery()) : ("Knowledge/");
 							
 	console.log({url, path});
 </script>
@@ -20,8 +18,6 @@
 		<header id="header" class="body header"></header>
 
 		<main id="main" class="body main">
-			<section id="chapter"></section>
-			<section id="option"></section>
 		</main>
 	</body>
 </html>
@@ -29,7 +25,7 @@
 <script> //header
 	var pathSplit = path.split("/")
 	var header = pathSplit[pathSplit.length-2];
-	setHeader(header);
+	$("header").html(header);
 				
 	console.log({pathSplit, header});
 </script>
@@ -44,6 +40,9 @@
 			$.ajax({url: dataURL, dataType : dataType}),
 			
 		).done(function(data){
+			console.log("dataAjax");
+			console.log(data);
+			
 			var list = [];
 			
 			data.forEach(function(e,i){
@@ -62,7 +61,6 @@
 	});
 
 
-
 	var listAjax = new Promise(function(resolve, reject) {
 		var contentsAPI = "https://api.github.com/repos/s10459020/Knowledge/contents";
 		var dataType = "json"
@@ -73,8 +71,8 @@
 			$.ajax({url: listURL, dataType : dataType})
 			
 		).done(function(list, data){
+			console.log("listAjax");
 			console.log(data[0]);
-			console.log(list);
 			
 			// image			
 			data[0].forEach( function(e){
@@ -96,6 +94,9 @@
 			
 			// directory
 			data[0].forEach( function(e){
+				if (e.name == "skip")
+					return;
+					
 				if (e.type == "dir") {
 					var option = Option.contain(list, e.name);
 					if (option)
@@ -118,9 +119,11 @@
 		listAjax
 		
 	).done(function(list){
+		console.log("list");
 		console.log(list);
+		
 		list.forEach(function(e){
-			//$("#main").append(e.getHTML());
+			$("#main").append(e.parseHTML(url, path));
 		});
 	});
 </script> 
