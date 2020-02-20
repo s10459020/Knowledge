@@ -2,7 +2,7 @@
 <script src="js/index.js"></script>
 <script>
 	var url = 'https://s10459020.github.io/Knowledge/'
-	var path = url + "Knowledge/" + (getPathQuery()? 
+	var path = "Knowledge/" + (getPathQuery()? 
 							getPathQuery():
 							"");
 							
@@ -37,27 +37,29 @@
 <script> // main	
 	var file = "data.json";
 	var dataType = "html"
-	$.ajax({
-		url: path + file,
-		dataType : dataType
-	})			
-	.done(function(data){
+	var contentsAPI = "https://api.github.com/repos/s10459020/Knowledge/contents";
+	var dataURL = url + path + file;
+	var listURL = contentsAPI + "/" + path;
+	
+	console.log({file, dataType, contentsAPI, dataURL, listURL});
+	
+	$.when(
+		$.ajax({url: dataURL,
+				dataType : dataType}),
+		//$.ajax({url: listURL,
+		//		dataType : dataType})
+				
+	).done(function(data, list){
+		console.log("when() success");
+		
 		var json = JSON.parse(data);
 		console.log(json);
 		
-	});
-	
-	console.log({file, dataType});
-</script> 
-
-<script> // option
-	var contentsAPI = "https://api.github.com/repos/s10459020/Knowledge/contents";
-	var contentsURL = (path)? (contentsAPI + "/" + path): (contentsAPI);
-	$.ajax({ 
-		url: contentsURL
-		,dataType : "html"
+		// chapter
 		
-	}).done(function(data){
+		
+		// option
+		/*
 		var rawList = $.parseJSON(data);
 		
 		var fileList = [];
@@ -116,8 +118,9 @@
 			
 		
 		});
-		
+		*/
 	}).fail(function(){
-		console.log("get fileList fail");
+		console.log("when() fail");
 	});
-</script>
+	
+</script> 
