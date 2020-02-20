@@ -35,92 +35,92 @@
 </script>
 	
 <script> // main	
-	var file = "data.json";
-	var dataType = "html"
-	var contentsAPI = "https://api.github.com/repos/s10459020/Knowledge/contents";
-	var dataURL = url + path + file;
-	var listURL = contentsAPI + "/" + path;
-	
-	console.log({file, dataType, contentsAPI, dataURL, listURL});
-	
-	$.when(
-		$.ajax({url: dataURL,
-				dataType : dataType}),
-		//$.ajax({url: listURL,
-		//		dataType : dataType})
+	var dataAjax = new Promise(function(resolve, reject) {
+		var file = "data.json";
+		var dataType = "json"
+		var dataURL = url + path + file;
+		
+	  	$.when(
+			$.ajax({url: dataURL, dataType : dataType}),
+			
+		).done(function(data){
+			var list = [];
+			
+			data.forEach(function(e,i){
+				if (e.type == "chapter") 
+					list.push(new Chapter(e.title, e.content));
+				else if (e.type == "option") 
+					list.push(new Option(e.title, e.content, null, false));
+			});
+			
+			resolve(list);
+			
+		}).fail(function(){
+			console.log("dataAjax fail");
+			resolve([]);
+		});
+	});
+
+
+
+	var listAjax = new Promise(function(resolve, reject) {
+		var contentsAPI = "https://api.github.com/repos/s10459020/Knowledge/contents";
+		var dataType = "json"
+		var listURL = contentsAPI + "/" + path;
+		
+	  	$.when(
+			dataAjax,
+			$.ajax({url: listURL, dataType : dataType})
+			
+		).done(function(list, data){
+			console.log(data[0]);
+			console.log(list);
+			
+			// image			
+			data[0].forEach( function(e){
+				var split = e.name.split(".");
+				var name = split[0];
+				var extension = split[1];
 				
-	).done(function(data, list){
-		console.log("when() success");
-		
-		var json = JSON.parse(data);
-		console.log(json);
-		
-		// chapter
-		
-		
-		// option
-		/*
-		var rawList = $.parseJSON(data);
-		
-		var fileList = [];
-		rawList.forEach( function(element){
-			switch(element.name){
-				case "css":
-				case "js":
-				case "main.json":
-				case "imageNoFound.jpg":
-					break;
-				default:
-					fileList.push(element.name);
-			}
-		});
-		
-		var articleList = {};
-		fileList.forEach( function(element){
-			var elementSplited = element.split(".");
-			var name = elementSplited[0];
-			var extension = elementSplited[1];
-			switch(extension){
-				// directory
-				case undefined: 
-					if (articleList[name] == undefined)
-						articleList[name] = {};
-					articleList[name]["directory"] = element;
-					break;
-					
-				// image
-				case "jpg":
-				case "png":
-				case "gif":
-					if (articleList[name] == undefined)
-						articleList[name] = {};
-					articleList[name]["image"] = element;
-					break;
-				
-				// content
-				case "json":
-					if (articleList[name] == undefined)
-						articleList[name] = {};
-					articleList[name]["content"] = element;
-					break;
-			}
-		});
-		
-		Object.keys(articleList).forEach(function(key){
+				switch(extension){
+					case "jpg":
+					case "png":
+					case "gif":
+						var option = Option.contain(list, name);
+						if (option)
+							option.image = e.name;
+						else
+							list.push(new Option(name, null, e.name, false));
+				}
+			});
 			
-			// header
-			var title = key;
+			// directory
+			data[0].forEach( function(e){
+				if (e.type == "dir") {
+					var option = Option.contain(list, e.name);
+					if (option)
+						option.link = true;
+					else
+						list.push(new Option(e.name, null, null, true));
+				}
+			});
 			
-			// image
-			var imgSrc = (articleList[key]["image"]) 
-				? (path + articleList[key]["image"])
-				: ("imageNoFound.jpg");
+			resolve(list);
 			
-		
+		}).fail(function(list, data){
+			console.log("listAjax fail");
+			resolve(list);
 		});
-		*/
-	}).fail(function(){
-		console.log("when() fail");
 	});
 	
+	
+	$.when(
+		listAjax
+		
+	).done(function(list){
+		console.log(list);
+		list.forEach(function(e){
+			//$("#main").append(e.getHTML());
+		});
+	});
 </script> 

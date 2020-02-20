@@ -27,6 +27,10 @@ function parseJSON(data){
 	return JSON.parse(predata);
 }
 
+function sleep (time) {
+  return new Promise((resolve) => setTimeout(resolve, time));
+}
+
 function setHeader(title) {
 	$("#header").html(title); 
 }
@@ -94,4 +98,30 @@ function setOption(title, content, image, link) {
 		});
 	}
 	*/
+}
+
+class Chapter{
+	constructor(title, content) {
+		this.title = title;
+		this.content = content;
+	}
+}
+
+class Option{
+	constructor(title, content, image, link) {
+		this.title = title;
+		this.content = content;
+		this.image = image;
+		this.link = link;
+	}
+	
+	static contain(list, title){
+		var option = null;
+		list.forEach(function(e){
+			if(e.title == title){
+				option = e;
+			}
+		});
+		return option;
+	}
 }
