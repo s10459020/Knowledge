@@ -1,7 +1,9 @@
 [
 {
-"type":"chapter",
-"title":"isomorphic tree",
-"content":"結構上不重複的樹"
+"type":"option",
+"title":"question",
+"content":[
+		"isomorphic tree"
+	]
 }
 ]
