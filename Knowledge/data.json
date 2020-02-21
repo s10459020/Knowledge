@@ -12,11 +12,17 @@
 {
 "type":"option",
 "title":"ComputerScience",
-"content":["演算法", "資料結構"]
+"content":[
+	"Algorithm 演算法",
+	"Data Structure 資料結構"
+	]
 },
 {
 "type":"option",
 "title":"ComputerSystem",
-"content":["作業系統", "Computer Archtecture"]
+"content":[
+	"Operator System 作業系統",
+	"Computer Archtecture 計算機架構"
+	]
 }
 ]
