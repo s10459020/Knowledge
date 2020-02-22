@@ -1,0 +1,27 @@
+[
+{
+"type":"option",
+"title":"Size",
+"content":[
+		"finite set: size is the element's number.",
+		"Infinite set: 如果可數，就沒分等級一率相等"
+	]
+},
+{
+"type":"option",
+"title":"Domain and Range Relative",
+"content":[
+		"one to one(injection)(嵌射): f:A->B 每個a都只能對應一個不同的b (一對一)",
+		"onto(surjection)(蓋射): f:A->B 所有b皆有一個a對應 (一對多)",
+		"bijection(對射): f:A->B 每個a都只對應一個b，集合A，B內所有的元素都有關係而沒有落單"
+	]
+},
+{
+"type":"option",
+"title":"Equivalence Relation 等價關係",
+"content":[
+		"定義為xRy，R須滿足下面條件，常寫成x~y",
+		"滿足: 自反、對稱、遞移",
+	]
+}
+]

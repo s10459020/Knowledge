@@ -6,13 +6,35 @@
 		"How many equation x1+x2+x3+x4=7, x >= 0",
 		"How many 10 ball to 6 distinct people"
 	]
-}
+},
 
 {
 "type":"option",
 "title":"Tree",
 "content":[
 		"How many non-isomorphic trees of n vertices"
+	]
+},
+
+{
+"type":"option",
+"title":"Statement",
+"content":[
+		"if domain is empty, ∀xP(x) is true."
+	]
+},
+
+{
+"type":"option",
+"title":"Generation function",
+"content":[
+		"g(x) = c0x^0 + c1x^1 + c2x^2...",
+		"E(x^n) = 1 / 1 - x",
+		"E(ax^n) = 1 / 1 - ax",
+		"E(x^2n) = 1 / 1 - x^2",
+		"E((n+1)x^n) = 1 / (1 - x)^2",
+		"E(C(n+2, 2)x^n) = 1 / (1 - x)^3"
+		"E(C(n+k, k)x^n) = 1 / (1 - x)^(k+1)"
 	]
 }
 ]

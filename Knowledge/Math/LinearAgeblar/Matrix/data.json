@@ -1,0 +1,33 @@
+[
+{
+"type":"chapter",
+"title":"Matrix",
+"content":
+"	m by n Matrix = M(m,n), m row and n colume."
+},
+{
+"type":"option",
+"title":"Vector",
+"content":[
+		"column Vector: m*1 matrix [a1, a2...]^T",
+		"row Vector: 1*m matrix [a1, a2...]"
+	]
+},
+{
+"type":"option",
+"title":"Rank",
+"content":[
+		"Rank = linearly independent column vectors",
+		"or linearly independent row vectors",
+		"Nullity = column - Rank"
+	]
+},
+{
+"type":"option",
+"title":"Inverse",
+"content":[
+		"A^-1A = I = AA^-1",
+		"若無法化簡為單位矩陣，則沒有反矩陣"
+	]
+}
+]
